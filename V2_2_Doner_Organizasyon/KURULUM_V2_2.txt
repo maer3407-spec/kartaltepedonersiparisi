@@ -1,4 +1,4 @@
-KARTALTEPE DÖNER ORGANİZASYON MERKEZİ — V2.2
+KARTALTEPE DÖNER ORGANİZASYON MERKEZİ — v2.2
 
 PAKET İÇERİĞİ
 - index.html: Müşteri satış ve talebe ikram ekranı. İkram formuna da ödeme yöntemi ve dinamik toplam tutar eklendi. Kayıt tamamlanınca kayıt numarası gösterilir.

@@ -838,7 +838,7 @@
         <strong id="createdRecordId" style="font-size:1.15rem;letter-spacing:.04em;word-break:break-word;"></strong>
       </div>
       <button type="button" class="action-btn btn-primary-olive" style="width:100%;" onclick="kayitNoKopyala()">Numarayı Kopyala</button>
-      <a href="./siparis-takip.html" class="action-btn btn-outline-brown" style="width:100%;margin-top:9px;text-decoration:none;">Sipariş / İkram Takibine Git</a>
+      <a id="trackCreatedRecord" href="./siparis-takip.html" class="action-btn btn-outline-brown" style="width:100%;margin-top:9px;text-decoration:none;">Sipariş / İkram Takibine Git</a>
       <button type="button" class="close-btn" style="margin-top:10px;" onclick="successModalKapat()">Kapat</button>
     </div>
   </div>
@@ -878,6 +878,9 @@
       kg05: 0
     };
     let aktifIkramUrunu = "";
+    const pendingRequestKeys = { satis: null, ikram: null };
+    function yeniIstekAnahtari(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+    document.addEventListener("DOMContentLoaded", () => { document.getElementById("satisFormu")?.addEventListener("input", () => pendingRequestKeys.satis = null); document.getElementById("ikramFormu")?.addEventListener("input", () => pendingRequestKeys.ikram = null); });
 
     function kgFormatla(sayi) {
       return Number.isInteger(sayi) ? sayi + " kg" : sayi.toFixed(1).replace('.', ',') + " kg";
@@ -1050,6 +1053,8 @@
     function siparisiGonder(e, kategori) {
       e.preventDefault();
       let payload = { kategori: kategori };
+      if (!pendingRequestKeys[kategori]) pendingRequestKeys[kategori] = yeniIstekAnahtari();
+      payload.requestKey = pendingRequestKeys[kategori];
       const aktifButon = document.getElementById(kategori === 'satis' ? 'satisGonderBtn' : 'ikramGonderBtn');
       if (kategori === 'satis') {
         const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
@@ -1083,7 +1088,9 @@
         if (!result || result.status !== 'success' || !result.id) { alert((result && result.message) || 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.'); return; }
         formuKapat(); e.target.reset();
         if (kategori === 'satis') sepetiTemizle();
+        pendingRequestKeys[kategori] = null;
         document.getElementById('createdRecordId').textContent = result.id;
+        document.getElementById('trackCreatedRecord').href = './siparis-takip.html?id=' + encodeURIComponent(result.id);
         document.getElementById('successModal').classList.add('active');
       };
       const hata = (err) => { aktifButon.innerText = eskiYazi; aktifButon.disabled = false; alert('Kayıt hatası: ' + (err.message || err)); };

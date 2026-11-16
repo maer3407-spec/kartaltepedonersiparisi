@@ -43,18 +43,18 @@
   <div class="loading-content">
     <div class="doner-scene" aria-hidden="true"><div class="doner-spin"><i class="doner-spit"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i></div></div>
     <div class="loading-title" id="loadingTitle">Lütfen bekleyiniz<span class="loading-dots"></span></div>
-    <div class="loading-subtitle" id="loadingSubtitle">Organizasyon bilgileri yükleniyor</div>
+    <div class="loading-subtitle" id="loadingSubtitle">Bilgiler Tazeleniyor.</div>
   </div>
 </div><main class="wrap"><section class="card">
-  <div class="brand"><div class="mark">D</div><div><div class="eyebrow">Döner Organizasyon Merkezi</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Sipariş ve talebe ikram takibi</div></div></div>
-  <h1>Kaydınızı takip edin</h1>
+  <div class="brand"><div class="mark">D</div><div><div class="eyebrow">Kartaltepe Döner Sipariş</div><div style="font-size:12px;color:var(--muted);margin-top:3px">Sipariş ve talebe ikram takibi</div></div></div>
+  <h1>Sipariş Hakkında Bilgi Alın</h1>
   <p>Sipariş veya ikram işleminiz tamamlandığında size verilen kayıt numarasını girin. Bu sayfada ad, telefon ve adres gibi kişisel bilgileriniz gösterilmez.</p>
   <form id="trackForm"><label class="label" for="recordId">Sipariş / ikram numarası</label><input id="recordId" autocomplete="off" autocapitalize="characters" placeholder="Örn. S-261116-123456-123456" required><button id="trackBtn" type="submit">Durumu görüntüle</button></form>
   <div id="errorBox" class="msg" role="alert"></div>
   <section id="result" class="result" aria-live="polite"><div class="result-head"><div class="eyebrow">Kayıt bulundu</div><div class="id" id="resultId"></div><div class="status" id="resultStatus"></div></div><div class="rows" id="resultRows"></div><div class="timeline"><div class="timeline-title">İşlem geçmişi</div><div id="timelineRows"></div></div></section>
-  <div id="helpBox" class="help"><button id="contactBtn" type="button">Değişiklik / iptal talebi için yöneticiyle görüş</button><div class="note">Sipariş bilgilerinde değişiklik ve iptal işlemleri yalnızca yetkili yönetici tarafından yapılır. WhatsApp açıldığında mesajı kontrol edip kendiniz gönderebilirsiniz.</div></div>
+  <div id="helpBox" class="help"><button id="contactBtn" type="button">Değişiklik / iptal talebi için yetkiliyle görüş</button><div class="note">Sipariş bilgilerinde değişiklik ve iptal işlemleri yalnızca yetkili yönetici tarafından yapılır. WhatsApp açıldığında mesajı kontrol edip kendiniz gönderebilirsiniz.</div></div>
   <a class="link" href="./index.html">Ana sayfaya dön</a>
-</section><div class="foot">Kayıt durumları yönetim panelindeki güncel bilgilere göre gösterilir.</div></main>
+</section><div class="foot">Kayıt durumları sistemimizdeki güncel bilgilere göre gösterilir.</div></main>
 <script>
 const form=document.getElementById('trackForm'),btn=document.getElementById('trackBtn'),errorBox=document.getElementById('errorBox'),result=document.getElementById('result');
 let currentRecordId='',contactNumber='';

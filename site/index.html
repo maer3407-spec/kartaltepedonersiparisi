@@ -594,7 +594,7 @@
   <div class="loading-content">
     <div class="doner-scene" aria-hidden="true"><div class="doner-spin"><i class="doner-spit"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i></div></div>
     <div class="loading-title" id="loadingTitle">Lütfen bekleyiniz<span class="loading-dots"></span></div>
-    <div class="loading-subtitle" id="loadingSubtitle">Organizasyon bilgileri yükleniyor</div>
+    <div class="loading-subtitle" id="loadingSubtitle">Bilgiler Tazeleniyor.</div>
   </div>
 </div>
 
@@ -603,8 +603,8 @@
     <!-- 1. HIZLI ERİŞİM VE SEPET -->
     <section class="section-card">
       <div class="section-header">
-        <h1 class="section-title">Kartaltepe Döner Siparişi</h1>
-        <p class="section-subtitle">Paket seçimi yaparak sipariş sepeti oluşturabilir veya talebelerimize ikramda bulunabilirsiniz.</p>
+        <h1 class="section-title">KARTALTEPE DÖNER SİPARİŞİ</h1>
+        <p class="section-subtitle">Kilogramlık paketlerin seçimini yaparak sepetinizi oluşturabilir ve toplu bir şekilde siparişinizi kaydedebilirsiniz. Aynı şekilde talebelerimize ikramda bulunabilirsiniz.</p>
         <div id="dynamicPublicInfo" style="margin-top:10px;padding:10px 12px;border-radius:8px;background:#EFF3EC;color:#3B4B32;font-size:.82rem;display:none;"></div>
       </div>
       
@@ -617,7 +617,7 @@
           </div>
           <div>
             <div class="product-title">1 Kg Döner</div>
-            <div class="product-desc">1 kg'lık paket olarak sepete ekle</div>
+            <div class="product-desc">1 kg'lık paketlerde hazırlanır. Teslimat tercihinize göre teslim edilir. Hemen Sepete Ekle!</div>
           </div>
         </button>
 
@@ -629,7 +629,7 @@
           </div>
           <div>
             <div class="product-title">Yarım Kg Döner</div>
-            <div class="product-desc">Yarım kg'lık paket olarak sepete ekle</div>
+            <div class="product-desc">0,5 kg'lık paketlerde hazırlanır. Teslimat tercihinize göre teslim edilir. Hemen Sepete Ekle!</div>
           </div>
         </button>
 
@@ -639,8 +639,8 @@
             <span class="category-tag">İkram</span>
           </div>
           <div>
-            <div class="product-title">Talebeye 1 Kg İkram</div>
-            <div class="product-desc">Talebelerimize 1 kg döner ikram eder misiniz?</div>
+            <div class="product-title">1 Kg İkram</div>
+            <div class="product-desc">Talebelerimize 1 kg döner ikram eder misiniz? Formda not kısmına yazacağınız isimlere talebelerimizle hergün hatimler okuyalım.</div>
           </div>
         </button>
 
@@ -650,8 +650,8 @@
             <span class="category-tag">İkram</span>
           </div>
           <div>
-            <div class="product-title">Talebeye Yarım Kg İkram</div>
-            <div class="product-desc">Talebelerimize yarım kg döner ikram eder misiniz?</div>
+            <div class="product-title">Yarım Kg İkram</div>
+            <div class="product-desc">Talebelerimize yarım kg döner ikram eder misiniz? Formda not kısmına yazacağınız isimlere talebelerimizle hergün hatimler okuyalım.</div>
           </div>
         </button>
       </div>
@@ -681,7 +681,7 @@
     <section class="section-card bank-card">
       <div class="section-header">
         <h2 class="section-title">Talebe İkramı İçin</h2>
-        <p class="section-subtitle">Yalnız ikramlarınız için BAĞIŞ açıklasıyla aşağıdaki ibanı kullanabilirsiniz.Iban bilgisi yalnız bağış içindir.</p>
+        <p class="section-subtitle">Yalnız ikramlarınız için BAĞIŞ açıklasıyla aşağıdaki ibanı kullanabilirsiniz.Iban bilgisi yalnız BAĞIŞ içindir.</p>
       </div>
       
       <div class="account-holder" id="hesapAdiMetni">
@@ -713,7 +713,7 @@
         Kartaltepe Mah. Sefalı Sok. No:2<br>
         Bakırköy / İstanbul
         <div class="address-contact">
-          <strong>İletişim Telefonu:</strong> 05345709807
+          <strong>İletişim Telefonu:</strong> 05555555555
         </div>
       </div>
 
@@ -723,7 +723,7 @@
     </section>
 
     <section class="section-card" style="text-align:center;">
-      <div style="font-weight:700;color:#4A5D3F;margin-bottom:5px;">Siparişinizi takip etmek ister misiniz?</div>
+      <div style="font-weight:700;color:#4A5D3F;margin-bottom:5px;">Siparişiniz Hakkında bilgi almak ister misiniz?</div>
       <div style="font-size:.84rem;color:#5A4A40;margin-bottom:12px;">Size verilen sipariş numarasıyla sipariş veya ikram kaydınızın güncel durumunu görüntüleyin.</div>
       <a href="./siparis-takip.html" class="action-btn btn-primary-olive" style="width:100%;text-decoration:none;">Sipariş Takibi</a>
     </section>
@@ -887,7 +887,7 @@
     function publicLoadingShow(message){ const o=document.getElementById('loadingOverlay'); if(o){o.classList.remove('is-hidden'); const sub=document.getElementById('loadingSubtitle'); if(sub&&message)sub.textContent=message;} }
 
     function publicConfigYukle() {
-      publicLoadingShow('Organizasyon fiyatı, kapasitesi ve seçenekleri alınıyor');
+      publicLoadingShow('Gerekli Bilgiler Tazeleniyor.');
       publicLoadingTimer = setTimeout(publicLoadingHide, 15000);
       window.v21PublicConfig = function(cfg) {
         if (!cfg) { publicLoadingHide(); return; } publicConfig = cfg;

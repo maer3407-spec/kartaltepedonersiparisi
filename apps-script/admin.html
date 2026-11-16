@@ -1,35 +1,1487 @@
 <!DOCTYPE html>
 <html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Döner Organizasyon Merkezi</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>
 :root{--bg:#f4f3ed;--card:#fff;--ink:#242b22;--muted:#71806b;--olive:#4a5d3f;--olive2:#eaf0e5;--line:#e3e7df;--blue:#2b4c65;--red:#a3433d;--shadow:0 10px 30px #26351b0d}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,Arial,sans-serif}.wrap{max-width:1440px;margin:auto;padding:24px}.login{max-width:420px;margin:8vh auto;background:white;padding:30px;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:0 0 16px}.muted{color:var(--muted)}label{display:block;font-weight:600;font-size:12px;margin:12px 0 6px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px;font:inherit;background:white;color:var(--ink)}button{border:0;border-radius:9px;background:var(--olive);color:white;padding:11px 15px;font:600 13px Inter;cursor:pointer}button.secondary{background:#edf1e9;color:var(--olive)}button.danger{background:#f8e9e7;color:var(--red)}button:disabled{opacity:.5}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border-radius:12px;background:var(--olive);color:white;display:grid;place-items:center;font-weight:800}.nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}.nav button{background:white;color:var(--muted);border:1px solid var(--line)}.nav button.active{background:var(--olive);color:white}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow);min-width:0}.metric{font-size:26px;font-weight:800;margin-top:8px}.metric small{font-size:12px;color:var(--muted);font-weight:500}.layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.section{margin-top:14px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{min-width:0}.checkrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}.checkrow label{display:flex;align-items:center;gap:7px;margin:0}.checkrow input{width:auto}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;min-width:720px;background:white}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);font-size:12px;white-space:nowrap}th{background:#f5f7f2;color:var(--muted);font-weight:700}tr:last-child td{border:0}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar input{max-width:280px}.hidden{display:none!important}.notice{padding:12px;border-radius:9px;background:var(--olive2);color:var(--olive);margin:12px 0}.error{background:#f9e9e7;color:var(--red)}.bar{height:9px;background:#edf0e9;border-radius:20px;overflow:hidden;margin-top:12px}.bar span{display:block;height:100%;background:var(--olive);width:0}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:11px}.right{text-align:right}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}@media(max-width:560px){.wrap{padding:14px}.grid{grid-template-columns:1fr 1fr;gap:9px}.card{padding:14px}.metric{font-size:21px}.formgrid{grid-template-columns:1fr}.top{align-items:flex-start}.top h1{font-size:19px}}
+
+/* WhatsApp quick-message actions */
+.whatsapp-btn{background:#25D366!important;color:#fff!important;border:1px solid #1fb85a!important;min-width:38px;padding:8px 10px!important;border-radius:9px!important;font-size:17px!important;line-height:1;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:5px;cursor:pointer}
+.whatsapp-btn:hover{filter:brightness(.95)}
+.action-cell{white-space:nowrap}
+</style><script>
+/* QR generation is bundled locally; no CDN/network request is needed.
+   QR algorithm: Kazuhiko Arase QRCode for JavaScript (MIT license). */
+(function(global){
+ var factories={'QRMode': function(require, module, exports) {
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+},
+'QRErrorCorrectLevel': function(require, module, exports) {
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+},
+'QRMaskPattern': function(require, module, exports) {
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+},
+'QRMath': function(require, module, exports) {
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+},
+'QRBitBuffer': function(require, module, exports) {
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+},
+'QRPolynomial': function(require, module, exports) {
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+},
+'QRRSBlock': function(require, module, exports) {
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+},
+'QRUtil': function(require, module, exports) {
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+},
+'QR8bitByte': function(require, module, exports) {
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = unescape(encodeURIComponent(String(data))); // UTF-8 byte sequence
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+},
+'index': function(require, module, exports) {
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+}};
+ var cache={};
+ function localRequire(name){name=String(name).replace(/^\.\//,'');if(!cache[name]){if(!factories[name])throw new Error('QR module missing: '+name);var m={exports:{}};cache[name]=m;factories[name](localRequire,m,m.exports);}return cache[name].exports;}
+ var QR=localRequire('index'), levels=localRequire('QRErrorCorrectLevel');
+ QR.toDataURL=function(text,opts){opts=opts||{};return new Promise(function(resolve,reject){try{
+   var qr=new QR(-1,levels[opts.errorCorrectionLevel||'M']);qr.addData(String(text));qr.make();
+   var count=qr.getModuleCount(), size=Number(opts.width)||420, margin=opts.margin==null?1:Number(opts.margin);
+   var canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;
+   var ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas kullanılamıyor.');
+   ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);ctx.fillStyle='#000';
+   var scale=size/(count+margin*2), offset=margin*scale;
+   for(var row=0;row<count;row++)for(var col=0;col<count;col++)if(qr.isDark(row,col))ctx.fillRect(Math.floor(offset+col*scale),Math.floor(offset+row*scale),Math.ceil(scale),Math.ceil(scale));
+   resolve(canvas.toDataURL('image/png'));
+ }catch(e){reject(e);}});};
+ global.QRCode=QR;
+})(window);
+</script>
+<style id="mobile-responsive-overrides">
+/* Responsive yönetim paneli: mevcut işlevlere dokunmadan mobil yerleşim */
+html{width:100%;min-width:320px;overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{width:100%;min-width:320px;overflow-x:hidden}
+.wrap{width:100%;max-width:1440px;margin-inline:auto}
+.card,.layout,.grid,.pane,.tablewrap{min-width:0;max-width:100%}
+.tablewrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+button,input,select,textarea{max-width:100%;min-height:42px}
+button{touch-action:manipulation}
+input,select,textarea{font-size:16px}
+.nav{min-width:0}
+@media(max-width:760px){
+ .wrap{padding:12px}
+ .top{align-items:center;flex-wrap:wrap;margin-bottom:14px}
+ .top>.brand{flex:1 1 220px;min-width:0}
+ .top>.brand>div:last-child{min-width:0}
+ .top h1{font-size:18px;line-height:1.25}
+ .top>.secondary{flex:0 0 auto;padding:10px 12px}
+ .nav{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:7px;padding:2px 1px 9px;margin:12px -12px 15px;padding-left:12px;padding-right:12px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:20;background:var(--bg)}
+ .nav button{flex:0 0 auto;white-space:nowrap;padding:10px 13px;min-height:42px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .layout{grid-template-columns:minmax(0,1fr);gap:10px;margin-top:10px}
+ .card{padding:13px;border-radius:12px}
+ .metric{font-size:21px;overflow-wrap:anywhere}
+ .toolbar{align-items:stretch;gap:8px}
+ .toolbar h2{font-size:16px;line-height:1.3}
+ .toolbar>input,.toolbar>select{flex:1 1 100%;width:100%;max-width:none!important;min-width:0}
+ .toolbar>button{flex:0 0 auto}
+ .formgrid{grid-template-columns:minmax(0,1fr);gap:8px}
+ .checkrow{gap:10px}
+ .checkrow label{min-height:38px}
+ .actions{gap:8px}
+ .actions button{flex:1 1 145px}
+ .tablewrap{width:100%;max-width:100%;border-radius:9px}
+ table{min-width:680px}
+ th,td{padding:10px;font-size:12px}
+ .action-cell{position:sticky;right:0;background:#fff;z-index:2;box-shadow:-5px 0 8px #26351b0d}
+ .action-cell button{min-height:38px}
+ #qrlabels .toolbar:first-child{align-items:flex-start}
+ #qrlabels .toolbar:first-child>button{align-self:flex-start}
+ #qrlabels .toolbar:nth-of-type(2)>input,#qrlabels .toolbar:nth-of-type(2)>select{flex:1 1 100%}
+ #qrlabels .toolbar:nth-of-type(2)>button{flex:1 1 calc(50% - 8px)}
+ #qrlabels .toolbar:last-of-type>button{width:100%;flex:1 1 100%;min-height:48px}
+ .login{width:calc(100% - 28px);max-width:420px;margin:7vh auto;padding:22px 18px}
+}
+@media(max-width:420px){
+ .wrap{padding:9px}
+ .top{gap:8px}
+ .mark{width:36px;height:36px;flex:0 0 36px}
+ .top h1{font-size:16px}
+ .top .muted{font-size:11px}
+ .top>.secondary{font-size:12px;padding:9px 10px}
+ .grid{gap:7px}
+ .card{padding:11px}
+ .metric{font-size:19px}
+ h2{font-size:16px}
+ .toolbar{gap:7px}
+ .toolbar>button{padding:10px 11px;font-size:12px}
+ .notice{font-size:12px}
+ .whatsapp-btn{min-width:40px;min-height:40px}
+}
+@media(prefers-reduced-motion:no-preference){.nav{scroll-behavior:smooth}}
+</style>
+
+<style>
+.status-pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#edf1e9;color:var(--olive);font-size:11px;font-weight:700}.attention-item{padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin:6px 0;background:#fff}.notification-unread{background:#f4f7ef;font-weight:700}.qr-video-active{display:block!important}
+@media(max-width:760px){#organizationSelect{max-width:100%!important;flex:1 1 100%}.nav{gap:6px}.nav button{font-size:12px}.formgrid{grid-template-columns:1fr}.pane .layout{grid-template-columns:1fr}}
+@media print{body *{visibility:hidden!important}#reports,#reports *{visibility:visible!important}#reports{position:absolute;inset:0;width:100%;background:#fff}}
+</style><style>
+/* Kuruma özel, harici kütüphanesiz 3B döner yükleme ekranı */
+.loading-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(247,246,240,.96);backdrop-filter:blur(5px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
+.loading-overlay.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loading-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;text-align:center;max-width:300px}
+.doner-scene{width:150px;height:166px;display:grid;place-items:center;perspective:650px;filter:drop-shadow(0 12px 12px rgba(57,43,25,.13))}
+.doner-spin{position:relative;width:112px;height:142px;transform-style:preserve-3d;animation:donerYSpin 1.55s linear infinite}
+.doner-spit{position:absolute;z-index:0;left:50%;top:4px;bottom:3px;width:7px;transform:translateX(-50%);border-radius:8px;background:linear-gradient(90deg,#75502e,#e0b56d 45%,#714627);box-shadow:0 0 0 1px rgba(91,57,28,.12)}
+.doner-layer{position:absolute;z-index:1;left:50%;height:20px;transform:translateX(-50%);border-radius:50%;border:2px solid #7b3d20;background:linear-gradient(180deg,#e9a45b 0%,#b95e2e 42%,#7e351f 75%,#d58a45 100%);box-shadow:inset 0 3px 3px rgba(255,221,160,.65),inset 0 -3px 4px rgba(75,28,12,.35),0 2px 2px rgba(68,39,20,.17);backface-visibility:visible}
+.doner-layer:after{content:"";position:absolute;left:12%;right:12%;top:3px;height:4px;border-radius:50%;background:rgba(255,218,153,.5);filter:blur(1px)}
+.doner-layer:nth-child(2){top:9px;width:94px;height:19px}
+.doner-layer:nth-child(3){top:25px;width:87px;height:19px}
+.doner-layer:nth-child(4){top:41px;width:79px;height:19px}
+.doner-layer:nth-child(5){top:57px;width:71px;height:19px}
+.doner-layer:nth-child(6){top:73px;width:62px;height:18px}
+.doner-layer:nth-child(7){top:88px;width:53px;height:17px}
+.doner-layer:nth-child(8){top:102px;width:43px;height:16px}
+.doner-layer:nth-child(9){top:115px;width:32px;height:15px}
+.doner-layer:nth-child(10){top:127px;width:20px;height:13px}
+.loading-title{font:700 16px/1.35 Inter,Arial,sans-serif;color:#3d4e34;letter-spacing:.01em}
+.loading-subtitle{font:400 12px/1.5 Inter,Arial,sans-serif;color:#7a806f;margin-top:-10px}
+.loading-dots:after{content:"";display:inline-block;width:1.5em;text-align:left;animation:loadingDots 1.25s steps(4,end) infinite}
+@keyframes donerYSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+@keyframes loadingDots{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}
+@media(prefers-reduced-motion:reduce){.doner-spin{animation-duration:5s}.loading-overlay{transition:none}.loading-dots:after{animation:none;content:"..."}}
+@media print{.loading-overlay{display:none!important}}
 </style></head><body>
-<div id="loginView" class="login"><div class="brand"><div class="mark">D</div><div><h1>Döner Organizasyon</h1><div class="muted">Yönetim paneli · V2.2</div></div></div><div id="loginMsg" class="notice hidden"></div><label>Kullanıcı adı</label><input id="username" autocomplete="username" value="yonetici"><label>Şifre</label><input id="password" type="password" autocomplete="current-password"><button style="width:100%;margin-top:18px" onclick="login()">Güvenli giriş yap</button><p class="muted small">İlk giriş şifresi Apps Script yürütme günlüğünde gösterilir.</p></div>
-<div id="app" class="hidden"><div class="wrap"><header class="top"><div class="brand"><div class="mark">D</div><div><h1>Döner Organizasyon Merkezi</h1><div class="muted" id="userLine">V2.2 · Yönetim</div></div></div><button class="secondary" onclick="logout()">Oturumu kapat</button></header>
-<nav class="nav"><button class="active" data-tab="dashboard" onclick="tab('dashboard',this)">Genel Bakış</button><button data-tab="orders" onclick="tab('orders',this)">Siparişler</button><button data-tab="gifts" onclick="tab('gifts',this)">Talebe İkramları</button><button data-tab="payments" onclick="tab('payments',this)">Ödemeler</button><button data-tab="cuts" onclick="tab('cuts',this)">Kesim Planı</button><button data-tab="packing" onclick="tab('packing',this)">Paketleme</button><button data-tab="delivery" onclick="tab('delivery',this)">Teslimat</button><button data-tab="settings" onclick="tab('settings',this)">Ayarlar</button><button data-tab="staff" onclick="tab('staff',this)">Personel</button></nav>
-<section id="dashboard" class="pane"><div class="grid"><div class="card"><div class="muted">Toplam kapasite</div><div class="metric" id="mCapacity">—</div></div><div class="card"><div class="muted">Kullanılan kapasite</div><div class="metric" id="mUsed">—</div></div><div class="card"><div class="muted">Kalan kapasite</div><div class="metric" id="mRemaining">—</div></div><div class="card"><div class="muted">Tahsil edilen</div><div class="metric" id="mCollected">—</div></div></div><div class="layout"><div class="card"><h2>Kapasite kullanımı</h2><div class="muted" id="capacityText">Veriler yükleniyor…</div><div class="bar"><span id="capacityBar"></span></div></div><div class="card"><h2>Organizasyon özeti</h2><div id="summaryText" class="muted">—</div></div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Son siparişler</h2><button class="secondary" onclick="loadDashboard()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>Müşteri</th><th>Kg</th><th>Tutar</th><th>Durum</th></tr></thead><tbody id="recentRows"></tbody></table></div></div></section>
+<div id="loadingOverlay" class="loading-overlay is-hidden" role="status" aria-live="polite" aria-label="Sayfa yükleniyor">
+  <div class="loading-content">
+    <div class="doner-scene" aria-hidden="true"><div class="doner-spin"><i class="doner-spit"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i></div></div>
+    <div class="loading-title" id="loadingTitle">Lütfen bekleyiniz<span class="loading-dots"></span></div>
+    <div class="loading-subtitle" id="loadingSubtitle">Organizasyon bilgileri yükleniyor</div>
+  </div>
+</div>
+<div id="loginView" class="login"><div class="brand"><div class="mark">D</div><div><h1>Döner Organizasyon</h1><div class="muted">Yönetim paneli · V3.0</div></div></div><div id="loginMsg" class="notice hidden"></div><label>Kullanıcı adı</label><input id="username" autocomplete="username" value="yonetici"><label>Şifre</label><input id="password" type="password" autocomplete="current-password"><button style="width:100%;margin-top:18px" onclick="login()">Güvenli giriş yap</button><p class="muted small">İlk giriş şifresi Apps Script yürütme günlüğünde gösterilir.</p></div>
+<div id="app" class="hidden"><div class="wrap"><header class="top"><div class="brand"><div class="mark">D</div><div><h1>Döner Organizasyon Merkezi</h1><div class="muted" id="userLine">V3.0 · Yönetim</div></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="organizationSelect" aria-label="Organizasyon seç" style="max-width:210px" onchange="switchOrganization(this.value)"><option>Organizasyonlar yükleniyor…</option></select><button class="secondary" onclick="logout()">Oturumu kapat</button></div></header>
+<div id="orgReadOnlyBanner" class="notice hidden" style="margin-bottom:10px">Bu organizasyon arşiv görünümünde. Kayıtlar yalnızca görüntülenebilir; yeni işlem ve değişiklik yapılamaz.</div><nav class="nav"><button class="active" data-tab="dashboard" onclick="tab('dashboard',this)">Genel Bakış</button><button data-tab="orders" onclick="tab('orders',this)">Siparişler</button><button data-tab="qrlabels" onclick="tab('qrlabels',this)">QR Etiketleri</button><button data-tab="gifts" onclick="tab('gifts',this)">Talebe İkramları</button><button data-tab="payments" onclick="tab('payments',this)">Ödemeler</button><button data-tab="cuts" onclick="tab('cuts',this)">Kesim Planı</button><button data-tab="packing" onclick="tab('packing',this)">Paketleme</button><button data-tab="delivery" onclick="tab('delivery',this)">Teslimat</button><button data-tab="settings" onclick="tab('settings',this)">Ayarlar</button><button data-tab="staff" onclick="tab('staff',this)">Personel</button><button data-tab="notifications" onclick="tab('notifications',this)">Bildirimler <span id="notificationBadge" class="small"></span></button><button data-tab="tasks" onclick="tab('tasks',this)">Görevler</button><button data-tab="reports" onclick="tab('reports',this)">Raporlar</button><button data-tab="archives" onclick="tab('archives',this)">Organizasyon Arşivi</button></nav>
+<section id="dashboard" class="pane"><div class="grid"><div class="card"><div class="muted">Toplam kapasite</div><div class="metric" id="mCapacity">—</div></div><div class="card"><div class="muted">Kullanılan kapasite</div><div class="metric" id="mUsed">—</div></div><div class="card"><div class="muted">Kalan kapasite</div><div class="metric" id="mRemaining">—</div></div><div class="card"><div class="muted">Tahsil edilen</div><div class="metric" id="mCollected">—</div></div></div><div class="layout"><div class="card"><h2>Kapasite kullanımı</h2><div class="muted" id="capacityText">Veriler yükleniyor…</div><div class="bar"><span id="capacityBar"></span></div></div><div class="card"><h2>Organizasyon özeti</h2><div id="summaryText" class="muted">—</div></div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Dikkat gerektiren işlemler</h2><button class="secondary" onclick="loadDashboard()">Yenile</button></div><div id="attentionRows" class="muted">Veriler yükleniyor…</div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Son siparişler</h2><button class="secondary" onclick="loadDashboard()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>Müşteri</th><th>Kg</th><th>Tutar</th><th>Durum</th></tr></thead><tbody id="recentRows"></tbody></table></div></div></section>
 <section id="orders" class="pane hidden"><div class="card"><div class="toolbar"><h2 style="margin:0">Sipariş kayıtları</h2><button class="secondary" onclick="loadOrders()">Yenile</button><input id="orderSearch" placeholder="Ad, telefon veya sipariş ID ara" oninput="renderOrders()"></div><div class="tablewrap"><table><thead><tr><th>Sipariş ID</th><th>Müşteri</th><th>Telefon</th><th>Kg</th><th>Tutar</th><th>Teslimat</th><th>Durum</th><th>Ödeme</th><th>İşlem</th></tr></thead><tbody id="orderRows"></tbody></table></div></div></section>
+<section id="qrlabels" class="pane hidden"><div class="card"><div class="toolbar"><div style="flex:1;min-width:220px"><h2 style="margin:0 0 4px">QR paket etiketleri</h2><div class="muted small">Siparişleri seçin; her QR kodun altında müşterinin adı yazsın. QR okutulduğunda sipariş bilgileri düz metin olarak açılır. Etiket kişisel veri içerir; yalnızca yetkili personelce kullanılmalıdır.</div></div><button class="secondary" onclick="loadOrders()">Siparişleri yenile</button></div><div class="toolbar"><input id="qrOrderSearch" placeholder="İsim, telefon veya sipariş numarası ara" oninput="renderQrSelection()"><select id="qrStatusFilter" onchange="renderQrSelection()" style="max-width:190px"><option value="">Tüm durumlar</option><option>Yeni</option><option>Hazırlanıyor</option><option>Teslimata Hazır</option><option>Tamamlandı</option><option>İptal Edildi</option></select><button class="secondary" onclick="selectVisibleQr(true)">Görünenleri seç</button><button class="secondary" onclick="selectVisibleQr(false)">Görünenleri kaldır</button></div><div class="notice" id="qrSelectionCount">0 sipariş seçildi.</div><div class="tablewrap"><table style="min-width:560px"><thead><tr><th>Seç</th><th>Sipariş No</th><th>İsim Soyisim</th><th>Telefon</th><th>Miktar</th><th>Durum</th></tr></thead><tbody id="qrOrderRows"><tr><td colspan="6">Siparişler yükleniyor…</td></tr></tbody></table></div><div class="toolbar" style="margin-top:16px"><span class="muted small" style="flex:1">Seçtiğiniz kayıtlar, durumundan bağımsız olarak yazdırılır.</span><button onclick="printSelectedQrLabels()">Seçilen QR etiketlerini A4 yazdır</button></div><div class="muted small" style="margin-top:10px">A4 dikey · Sayfa başına 12 etiket · Kesim çizgisi veya bölme yok · Chrome yazdırma penceresi açılır.</div></div></section>
 <section id="gifts" class="pane hidden"><div class="card"><div class="toolbar"><h2 style="margin:0">Talebe ikram kayıtları</h2><button class="secondary" onclick="loadGifts()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>İkram ID</th><th>Hayırsever</th><th>Ürün</th><th>Paket</th><th>Kg</th><th>Tutar</th><th>Ödeme Yöntemi</th><th>Tahsilat</th><th>İkram Durumu</th><th>İşlem</th></tr></thead><tbody id="giftRows"></tbody></table></div></div></section>
-<section id="payments" class="pane hidden"><div class="layout"><div class="card"><h2>Yeni ödeme kaydı</h2><label>Sipariş / ikram numarası</label><input id="payOrder" placeholder="S-... veya I-..."><label>Tutar (TL)</label><input id="payAmount" type="number" min="0.01" step="0.01"><label>Yöntem</label><select id="payMethod"><option>Havale/EFT</option><option>Nakit</option></select><label>Açıklama</label><input id="payNote" placeholder="İsteğe bağlı"><button style="margin-top:14px" onclick="addPayment()">Ödemeyi kaydet</button></div><div class="card"><h2>Ödeme kayıtları</h2><div class="muted">Her tahsilat ayrı satır olarak tutulur; satış veya ikramın tahsilat durumu otomatik güncellenir.</div><button class="secondary" style="margin-top:14px" onclick="loadPayments()">Ödemeleri yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Ödeme ID</th><th>Kayıt ID</th><th>Kayıt Türü</th><th>Tarih</th><th>Tutar</th><th>Yöntem</th><th>Durum</th><th>Kaydeden</th></tr></thead><tbody id="paymentRows"></tbody></table></div></div></section>
+<section id="payments" class="pane hidden"><div class="layout"><div class="card"><h2>Yeni ödeme kaydı</h2><label>Sipariş / ikram numarası</label><input id="payOrder" placeholder="S-... veya I-..."><label>Tutar (TL)</label><input id="payAmount" type="number" min="0.01" step="0.01"><label>Yöntem</label><select id="payMethod"><option>Havale/EFT</option><option>Nakit</option></select><label>Açıklama</label><input id="payNote" placeholder="İsteğe bağlı"><button style="margin-top:14px" onclick="addPayment()">Ödemeyi kaydet</button></div><div class="card"><h2>Ödeme kayıtları</h2><div class="muted">Her tahsilat ayrı satır olarak tutulur. Hatalı tahsilat kayıtları silinmez; gerekçeyle iptal edilerek denetim geçmişinde korunur.</div><button class="secondary" style="margin-top:14px" onclick="loadPayments()">Ödemeleri yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Ödeme ID</th><th>Kayıt ID</th><th>Kayıt Türü</th><th>Tarih</th><th>Tutar</th><th>Yöntem</th><th>Durum</th><th>Kaydeden</th><th>İşlem</th></tr></thead><tbody id="paymentRows"></tbody></table></div></div></section>
 <section id="cuts" class="pane hidden"><div class="layout"><div class="card"><h2>Kesim planı oluştur</h2><label>Kesim tarihi</label><input id="cutDate" type="date"><label>Planlanan miktar (kg)</label><input id="cutKg" type="number" min="0.5" step="0.5"><label>Not</label><textarea id="cutNote" rows="2"></textarea><button style="margin-top:14px" onclick="addCut()">Kesim planını kaydet</button></div><div class="card"><h2>Kesim takvimi</h2><p class="muted">Kesim günlerini, planlanan kilogramı ve tamamlanma durumunu buradan yönetin.</p><button class="secondary" onclick="loadCuts()">Yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Kesim ID</th><th>Tarih</th><th>Planlanan Kg</th><th>Durum</th><th>Not</th><th>Güncelle</th></tr></thead><tbody id="cutRows"></tbody></table></div></div></section>
-<section id="packing" class="pane hidden"><div class="layout"><div class="card"><h2>Paketleme kaydı ekle</h2><label>Sipariş / ikram numarası</label><input id="packRecordId" placeholder="S-... veya I-..."><label>Kayıt türü</label><select id="packRecordType"><option>Satış</option><option>İkram</option></select><label>Paket tipi</label><select id="packType"><option>1 Kg</option><option>500 g</option><option>Karışık paket</option></select><div class="formgrid"><div><label>Paket adedi</label><input id="packCount" type="number" min="1" value="1"></div><div><label>Paketlenen kg</label><input id="packKg" type="number" min="0.5" step="0.5"></div></div><label>Not</label><input id="packNote"><button style="margin-top:14px" onclick="addPacking()">Paketleme kaydet</button></div><div class="card"><h2>Paketleme merkezi</h2><p class="muted">Her paketleme işlemi ilgili satış veya ikram numarasına bağlanır.</p><button class="secondary" onclick="loadPacking()">Yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Paket ID</th><th>Kayıt ID</th><th>Tür</th><th>Paket Tipi</th><th>Adet</th><th>Kg</th><th>Durum</th><th>Güncelle</th></tr></thead><tbody id="packingRows"></tbody></table></div></div></section>
-<section id="delivery" class="pane hidden"><div class="layout"><div class="card"><h2>Teslimat planla</h2><label>Sipariş / ikram numarası</label><input id="deliveryRecordId" placeholder="S-... veya I-..."><label>Kayıt türü</label><select id="deliveryRecordType"><option>Satış</option><option>İkram</option></select><label>Teslimat tarihi</label><input id="deliveryDate" type="date"><label>Teslimat şekli</label><select id="deliveryType"><option>Adrese Teslim</option><option>Gel-Al</option><option>Toplu Dağıtım</option></select><label>Adres / teslim noktası</label><textarea id="deliveryAddress" rows="2"></textarea><label>Görevli personel</label><input id="deliveryStaff"><label>Not</label><input id="deliveryNote"><button style="margin-top:14px" onclick="addDelivery()">Teslimatı planla</button></div><div class="card"><h2>Teslimat merkezi</h2><p class="muted">Planlanan teslimatları ve teslimat durumlarını buradan takip edin.</p><button class="secondary" onclick="loadDelivery()">Yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Teslimat ID</th><th>Kayıt ID</th><th>Tarih</th><th>Şekil</th><th>Adres / Nokta</th><th>Personel</th><th>Durum</th><th>Güncelle</th></tr></thead><tbody id="deliveryRows"></tbody></table></div></div></section>
+<section id="packing" class="pane hidden"><div class="layout"><div class="card"><h2>Paketleme kaydı ekle</h2><label>Sipariş / ikram numarası</label><input id="packRecordId" placeholder="S-... veya I-..."><label>Kayıt türü</label><select id="packRecordType"><option>Satış</option><option>İkram</option></select><label>Paket tipi</label><select id="packType"><option>1 Kg</option><option>500 g</option><option>Karışık paket</option></select><div class="formgrid"><div><label>Paket adedi</label><input id="packCount" type="number" min="1" value="1"></div><div><label>Paketlenen kg</label><input id="packKg" type="number" min="0.5" step="0.5"></div></div><label>Not</label><input id="packNote"><button style="margin-top:14px" onclick="addPacking()">Paketleme kaydet</button></div><div class="card"><h2>Paketleme merkezi</h2><p class="muted">Önce sipariş/ikram Onaylandı durumuna alınır. Paketleme miktarı toplam ihtiyacı aşamaz; tamamlanınca kayıt durumu otomatik ilerler.</p><button class="secondary" onclick="loadPacking()">Yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Paket ID</th><th>Kayıt ID</th><th>Tür</th><th>Paket Tipi</th><th>Adet</th><th>Kg</th><th>Durum</th><th>Güncelle</th></tr></thead><tbody id="packingRows"></tbody></table></div></div></section>
+<section id="delivery" class="pane hidden"><div class="card section"><h2>QR ile teslimat doğrulama</h2><p class="muted small">Paket üzerindeki QR kodu okutun. Sistem kayıt numarasını bulur, paketleme ve teslimat durumunu kontrol eder. Kamera desteklenmiyorsa QR içeriğini elle yapıştırabilirsiniz.</p><div class="formgrid"><div><label>QR içeriği / kayıt numarası</label><input id="qrScanInput" placeholder="S-... veya QR metnini buraya okutun"></div><div><label>Teslim alan kişi (isteğe bağlı)</label><input id="qrReceiver" placeholder="Ad soyad"></div></div><div class="toolbar" style="margin-top:12px"><button onclick="confirmQrDelivery()">Teslimatı doğrula</button><button class="secondary" onclick="startQrScanner()">Kamerayı aç</button><button class="secondary" onclick="stopQrScanner()">Kamerayı kapat</button></div><video id="qrVideo" playsinline muted style="display:none;width:100%;max-width:420px;border-radius:12px;background:#111;margin-top:10px"></video><div id="qrScanMsg" class="muted small" aria-live="polite"></div></div><div class="layout"><div class="card"><h2>Teslimat planla</h2><label>Sipariş / ikram numarası</label><input id="deliveryRecordId" placeholder="S-... veya I-..."><label>Kayıt türü</label><select id="deliveryRecordType"><option>Satış</option><option>İkram</option></select><label>Teslimat tarihi</label><input id="deliveryDate" type="date"><label>Teslimat şekli</label><select id="deliveryType"><option>Adrese Teslim</option><option>Gel-Al</option><option>Toplu Dağıtım</option></select><label>Adres / teslim noktası</label><textarea id="deliveryAddress" rows="2"></textarea><label>Görevli personel</label><input id="deliveryStaff"><label>Not</label><input id="deliveryNote"><button style="margin-top:14px" onclick="addDelivery()">Teslimatı planla</button></div><div class="card"><h2>Teslimat merkezi</h2><p class="muted">Planlanan teslimatları ve teslimat durumlarını buradan takip edin.</p><button class="secondary" onclick="loadDelivery()">Yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Teslimat ID</th><th>Kayıt ID</th><th>Tarih</th><th>Şekil</th><th>Adres / Nokta</th><th>Personel</th><th>Durum</th><th>Güncelle</th></tr></thead><tbody id="deliveryRows"></tbody></table></div></div></section>
 <section id="settings" class="pane hidden"><div class="card"><h2>Dinamik sistem ayarları</h2><p class="muted">Bu alanlardan yaptığınız değişiklikler Google E-Tabloya kaydedilir ve herkese açık sipariş ekranında bir sonraki yüklemede gösterilir.</p><div class="formgrid"><div class="field"><label>Kg satış fiyatı (TL)</label><input id="s_pricePerKg" type="number" min="0"></div><div class="field"><label>Toplam kapasite (kg)</label><input id="s_capacityKg" type="number" min="1" step="0.5"></div><div class="field"><label>Hesap sahibi</label><input id="s_accountName"></div><div class="field"><label>IBAN</label><input id="s_iban"></div><div class="field"><label>Gel-al adresi</label><textarea id="s_pickupAddress" rows="2"></textarea></div><div class="field"><label>İletişim telefonu</label><input id="s_contactPhone"></div><div class="field"><label>Satış hedef kapasitesi (kg)</label><input id="s_salesCapacityKg" type="number" min="0"></div><div class="field"><label>Müşteri ekranı duyurusu</label><textarea id="s_publicNotice" rows="2"></textarea></div></div><div class="checkrow"><label><input type="checkbox" id="s_orderOpen"> Sipariş alımı açık</label><label><input type="checkbox" id="s_deliveryEnabled"> Adrese teslim</label><label><input type="checkbox" id="s_pickupEnabled"> Gel-al</label><label><input type="checkbox" id="s_cashEnabled"> Nakit</label><label><input type="checkbox" id="s_bankEnabled"> Havale/EFT</label></div><div class="actions" style="margin-top:18px"><button onclick="saveSettings()">Ayarları kaydet</button><button class="secondary" onclick="loadSettings()">Sunucudan yeniden yükle</button></div><div id="settingsMsg"></div></div></section>
-<section id="staff" class="pane hidden"><div class="layout"><div class="card"><h2>Personel ekle</h2><label>Ad soyad</label><input id="staffName"><label>Kullanıcı adı</label><input id="staffUser"><label>İlk şifre (en az 8 karakter)</label><input id="staffPass" type="password"><label>Rol</label><select id="staffRole"><option value="manager">Yönetici yardımcısı</option><option value="finance">Finans / tahsilat</option><option value="operations">Operasyon / teslimat</option></select><button style="margin-top:14px" onclick="addStaff()">Personeli ekle</button></div><div class="card"><h2>Yetki modeli</h2><p class="muted">Yönetici: tüm alanlar ve personel yönetimi<br>Yönetici yardımcısı: ayarlar, sipariş ve operasyon<br>Finans: siparişleri görme ve ödeme kaydı<br>Operasyon: sipariş ve ikram operasyonu</p></div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Personel listesi</h2><button class="secondary" onclick="loadStaff()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>Ad Soyad</th><th>Kullanıcı adı</th><th>Rol</th><th>Durum</th><th></th></tr></thead><tbody id="staffRows"></tbody></table></div></div></section>
+<section id="staff" class="pane hidden"><div class="layout"><div class="card"><h2>Personel ekle</h2><label>Ad soyad</label><input id="staffName"><label>Kullanıcı adı</label><input id="staffUser"><label>İlk şifre (en az 8 karakter)</label><input id="staffPass" type="password"><label>Rol</label><select id="staffRole"><option value="manager">Yönetici yardımcısı</option><option value="finance">Finans / tahsilat</option><option value="operations">Operasyon</option><option value="preparation">Hazırlık</option><option value="packing">Paketleme</option><option value="delivery">Teslimat</option></select><button style="margin-top:14px" onclick="addStaff()">Personeli ekle</button></div><div class="card"><h2>Yetki modeli</h2><p class="muted">Ana yönetici: tüm alanlar, personel ve organizasyon yönetimi<br>Yönetici yardımcısı: operasyon, ayarlar ve raporlar<br>Finans: ödeme, tahsilat ve mali raporlar<br>Operasyon: sipariş, ikram ve süreç yönetimi<br>Hazırlık: kesim planı ve görevler<br>Paketleme: paketleme ve QR etiketleri<br>Teslimat: teslimat ve QR doğrulama</p></div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Personel listesi</h2><button class="secondary" onclick="loadStaff()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>Ad Soyad</th><th>Kullanıcı adı</th><th>Rol</th><th>Durum</th><th></th></tr></thead><tbody id="staffRows"></tbody></table></div></div></section>
+
+<section id="notifications" class="pane hidden"><div class="card"><div class="toolbar"><h2 style="margin:0">Bildirim merkezi</h2><button class="secondary" onclick="loadNotifications()">Yenile</button></div><div class="tablewrap"><table><thead><tr><th>Tarih</th><th>Tür</th><th>Başlık</th><th>Mesaj</th><th>Durum</th><th></th></tr></thead><tbody id="notificationRows"></tbody></table></div></div></section>
+<section id="tasks" class="pane hidden"><div class="layout"><div class="card" id="taskCreateCard"><h2>Yeni görev oluştur</h2><label>Görev başlığı</label><input id="taskTitle" maxlength="120" placeholder="Örn. Paketleme alanını hazırla"><label>Açıklama</label><textarea id="taskDescription" rows="3"></textarea><div class="formgrid"><div><label>Öncelik</label><select id="taskPriority"><option>Normal</option><option>Yüksek</option><option>Acil</option><option>Düşük</option></select></div><div><label>Son tarih</label><input id="taskDueDate" type="date"></div></div><label>Personel</label><select id="taskAssignee"><option value="">Role göre ata</option></select><label>Atanacak rol</label><select id="taskRole"><option value="operations">Operasyon</option><option value="preparation">Hazırlık</option><option value="packing">Paketleme</option><option value="delivery">Teslimat</option><option value="finance">Finans</option></select><label>İlgili sipariş / ikram numarası (isteğe bağlı)</label><input id="taskRecordId" placeholder="S-... veya I-..."><button style="margin-top:14px" onclick="createTask()">Görevi oluştur</button></div><div class="card"><h2>Görev işleyişi</h2><p class="muted">Görevler personele veya role atanır. Personel kendi görevlerini görür; yetkili yönetici bütün görevleri izler. Tamamlanan görevler geçmişte kalır.</p><button class="secondary" onclick="loadTasks()">Görevleri yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Görev</th><th>Öncelik</th><th>Atanan</th><th>Rol</th><th>Son tarih</th><th>İlgili kayıt</th><th>Durum</th></tr></thead><tbody id="taskRows"></tbody></table></div></div></section>
+<section id="reports" class="pane hidden"><div class="grid"><div class="card"><div class="muted">Beklenen toplam</div><div class="metric" id="rExpected">—</div></div><div class="card"><div class="muted">Tahsil edilen</div><div class="metric" id="rCollected">—</div></div><div class="card"><div class="muted">Kalan tahsilat</div><div class="metric" id="rOutstanding">—</div></div><div class="card"><div class="muted">Toplam miktar</div><div class="metric" id="rKg">—</div></div></div><div class="card section"><div class="toolbar"><h2 style="margin:0">Organizasyon kapanış özeti</h2><button class="secondary" onclick="loadReports()">Raporu yenile</button><button onclick="window.print()">Raporu yazdır</button></div><div id="reportSummary" class="muted"></div></div><div class="card section" id="auditCard"><div class="toolbar"><h2 style="margin:0">İşlem geçmişi</h2><button class="secondary" onclick="loadAudit()">Geçmişi yenile</button></div><div class="tablewrap"><table><thead><tr><th>Tarih</th><th>İşlem</th><th>Kayıt</th><th>Detay</th><th>Kullanıcı</th><th>Eski değer</th><th>Yeni değer</th></tr></thead><tbody id="auditRows"></tbody></table></div></div></section>
+<section id="archives" class="pane hidden"><div class="layout"><div class="card" id="newOrgCard"><h2>Yeni organizasyon aç</h2><p class="muted small">Yeni organizasyon açıldığında mevcut organizasyon arşive alınır. Eski kayıtlar silinmez ve yeni döneme karışmaz.</p><label>Organizasyon adı</label><input id="orgName" placeholder="Örn. 2027 Bahar Döner Organizasyonu"><div class="formgrid"><div><label>Başlangıç tarihi</label><input id="orgStartDate" type="date"></div><div><label>Kapasite (kg)</label><input id="orgCapacity" type="number" min="1" value="400"></div></div><label>Kg fiyatı (TL)</label><input id="orgPrice" type="number" min="1" value="850"><button style="margin-top:14px" onclick="createOrganization()">Organizasyonu oluştur</button></div><div class="card"><h2>Organizasyon arşivi</h2><p class="muted">Bir dönemi seçerek geçmiş kayıtlarını salt okunur şekilde görüntüleyebilirsiniz. Yeni sipariş yalnızca aktif organizasyona alınır.</p><button class="secondary" onclick="loadOrganizations()">Listeyi yenile</button></div></div><div class="card section"><div class="tablewrap"><table><thead><tr><th>Organizasyon</th><th>Başlangıç</th><th>Bitiş</th><th>Kapasite</th><th>Kg fiyatı</th><th>Durum</th><th>Görünüm</th></tr></thead><tbody id="organizationRows"></tbody></table></div></div></section>
+<div id="giftEditModal" class="hidden" style="position:fixed;inset:0;background:#10181099;z-index:1001;align-items:center;justify-content:center;padding:16px"><div class="card" style="width:100%;max-width:520px;max-height:90vh;overflow:auto"><div class="toolbar"><h2 style="margin:0;flex:1">Talebe ikramını düzenle</h2><button class="secondary" onclick="closeGiftEdit()">Kapat</button></div><input type="hidden" id="editGiftId"><label>Hayırsever adı soyadı</label><input id="editGiftName"><label>Telefon</label><input id="editGiftPhone"><label>İkram ürünü</label><select id="editGiftProduct"><option>Talebeye 1 Kg İkram</option><option>Talebeye Yarım Kg İkram</option></select><label>Adet / paket</label><input id="editGiftQty" type="number" min="1" step="1"><label>İkram / dua notu</label><textarea id="editGiftNote" rows="3"></textarea><div class="notice">İkram miktarı yalnızca hazırlık ve paketleme başlamadan önce değiştirilebilir. Yeni tutar kayıt anındaki kg fiyatıyla hesaplanır.</div><button style="margin-top:14px" onclick="saveGiftEdit()">Değişiklikleri kaydet</button></div></div>
+<div id="recordEditModal" class="hidden" style="position:fixed;inset:0;background:#10181099;z-index:1000;align-items:center;justify-content:center;padding:16px"><div class="card" style="width:100%;max-width:560px;max-height:90vh;overflow:auto"><div class="toolbar"><h2 style="margin:0;flex:1">Sipariş bilgilerini düzenle</h2><button class="secondary" onclick="closeRecordEdit()">Kapat</button></div><input type="hidden" id="editRecordId"><label>Ad soyad</label><input id="editName"><label>Telefon</label><input id="editPhone"><div class="formgrid"><div><label>1 kg paket adedi</label><input id="edit1Kg" type="number" min="0" step="1"></div><div><label>Yarım kg paket adedi</label><input id="editHalfKg" type="number" min="0" step="1"></div></div><div class="notice">Miktar değişikliği yalnızca paketleme başlamadan önce yapılabilir. Yeni tutar kayıt anındaki kg fiyatıyla hesaplanır; mevcut tahsilat yeni tutarı aşamaz.</div><label>Teslimat şekli</label><select id="editDeliveryType"><option>Adrese Teslim</option><option>Gel-Al</option></select><label>Teslimat tarihi</label><input id="editDeliveryDate" type="date" required><div class="formgrid"><div><label>İlçe</label><input id="editDistrict"></div><div><label>Mahalle</label><input id="editNeighborhood"></div></div><label>Açık adres</label><textarea id="editAddress" rows="2"></textarea><label>Not</label><textarea id="editNotes" rows="2"></textarea><button style="margin-top:14px" onclick="saveOrderEdit()">Değişiklikleri kaydet</button></div></div>
 <div id="globalMsg" class="notice hidden"></div></div></div>
+<style>
+#qrPrintArea{display:none}
+@media print{
+  @page{size:A4 portrait;margin:5mm}
+  html,body{width:210mm!important;margin:0!important;padding:0!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body *{visibility:hidden!important}
+  #qrPrintArea,#qrPrintArea *{visibility:visible!important}
+  #qrPrintArea{display:block!important;position:absolute;left:0;top:0;width:200mm;background:#fff}
+  .qr-page{width:200mm;height:287mm;display:grid;grid-template-columns:repeat(3,63mm);grid-template-rows:repeat(4,70mm);column-gap:2mm;row-gap:2mm;page-break-after:always;break-after:page;overflow:hidden}
+  .qr-page:last-child{page-break-after:auto;break-after:auto}
+  .qr-label{width:63mm;height:70mm;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3mm 2mm 1mm;overflow:hidden;break-inside:avoid;page-break-inside:avoid}
+  .qr-code{width:48mm;height:48mm;display:flex;align-items:center;justify-content:center}
+  .qr-code img,.qr-code canvas{width:48mm!important;height:48mm!important;image-rendering:pixelated}
+  .qr-name{font-family:Arial,sans-serif;font-size:9pt;font-weight:600;line-height:1.15;text-align:center;margin-top:2mm;max-width:59mm;overflow-wrap:anywhere;color:#111}
+}
+</style>
+<div id="qrPrintArea" aria-hidden="true"></div>
 <script>
-let token='',orders=[],gifts=[],settings={},staff=[];
-function call(name,...args){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e.message||e)))[name](token,...args));}
+let token='',orders=[],gifts=[],settings={},staff=[];const selectedQrOrders=new Set();
+let activeLoadingCalls=0;
+function loadingStart(message){activeLoadingCalls++;const o=document.getElementById('loadingOverlay');if(!o)return;o.classList.remove('is-hidden');const t=document.getElementById('loadingTitle'),sub=document.getElementById('loadingSubtitle');if(t)t.innerHTML='Lütfen bekleyiniz<span class="loading-dots"></span>';if(sub&&message)sub.textContent=message;}
+function loadingEnd(){activeLoadingCalls=Math.max(0,activeLoadingCalls-1);if(activeLoadingCalls===0){const o=document.getElementById('loadingOverlay');if(o)o.classList.add('is-hidden');}}
+function call(name,...args){return new Promise((resolve,reject)=>{loadingStart('Bilgiler güvenli bağlantı üzerinden alınıyor');let settled=false;const done=(fn,value)=>{if(settled)return;settled=true;loadingEnd();fn(value)};try{google.script.run.withSuccessHandler(v=>done(resolve,v)).withFailureHandler(e=>done(reject,new Error(e.message||e)))[name](token,...args)}catch(e){done(reject,e)}})}
 function msg(t,err=false,id='globalMsg'){const el=document.getElementById(id);el.textContent=t;el.classList.remove('hidden','error');if(err)el.classList.add('error');setTimeout(()=>el.classList.add('hidden'),5000)}
-function login(){const u=document.getElementById('username').value,p=document.getElementById('password').value;google.script.run.withSuccessHandler(r=>{token=r.token;document.getElementById('loginView').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userLine').textContent=r.name+' · '+r.role+' · V2.2';loadAll();}).withFailureHandler(e=>{const el=document.getElementById('loginMsg');el.textContent=e.message||e;el.classList.remove('hidden');el.classList.add('error');}).adminLogin(u,p)}
+function login(){const u=document.getElementById('username').value,p=document.getElementById('password').value;google.script.run.withSuccessHandler(r=>{token=r.token;document.getElementById('loginView').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userLine').textContent=r.name+' · '+r.role+' · V3.0';loadAll();}).withFailureHandler(e=>{const el=document.getElementById('loginMsg');el.textContent=e.message||e;el.classList.remove('hidden');el.classList.add('error');}).adminLogin(u,p)}
 function logout(){google.script.run.adminLogout(token);token='';document.getElementById('app').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden');document.getElementById('password').value=''}
-function tab(id,btn){document.querySelectorAll('.pane').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='orders')loadOrders();if(id==='gifts')loadGifts();if(id==='payments')loadPayments();if(id==='cuts')loadCuts();if(id==='packing')loadPacking();if(id==='delivery')loadDelivery();if(id==='settings')loadSettings();if(id==='staff')loadStaff()}
+function tab(id,btn){document.querySelectorAll('.pane').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='orders'||id==='qrlabels')loadOrders();if(id==='gifts')loadGifts();if(id==='payments')loadPayments();if(id==='cuts')loadCuts();if(id==='packing')loadPacking();if(id==='delivery')loadDelivery();if(id==='settings')loadSettings();if(id==='staff')loadStaff()}
 function loadAll(){loadDashboard();loadSettings();loadOrders();}
 function tl(v){return (Number(v)||0).toLocaleString('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:2})}
-function loadDashboard(){call('adminGetDashboard').then(d=>{document.getElementById('mCapacity').textContent=d.capacity+' kg';document.getElementById('mUsed').textContent=d.used.toFixed(1)+' kg';document.getElementById('mRemaining').textContent=d.remaining.toFixed(1)+' kg';document.getElementById('mCollected').textContent=tl(d.collected);document.getElementById('capacityText').textContent=d.used.toFixed(1)+' / '+d.capacity+' kg kullanıldı';document.getElementById('capacityBar').style.width=Math.min(100,d.capacity?d.used/d.capacity*100:0)+'%';document.getElementById('summaryText').innerHTML='Satış: <b>'+d.salesKg.toFixed(1)+' kg</b><br>İkram: <b>'+d.giftKg.toFixed(1)+' kg</b><br>Sipariş: <b>'+d.orderCount+'</b><br>İkram kaydı: <b>'+d.giftCount+'</b><br>Kg fiyatı: <b>'+tl(d.pricePerKg)+'</b><br>Sipariş durumu: <b>'+(d.orderOpen?'Açık':'Kapalı')+'</b>';document.getElementById('recentRows').innerHTML=(d.recentOrders||[]).map(r=>'<tr><td>'+esc(r['Sipariş ID'])+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+tl(r['Toplam Tutar'])+'</td><td>'+esc(r['Sipariş Durumu'])+'</td></tr>').join('')||'<tr><td colspan="5">Henüz kayıt yok.</td></tr>'}).catch(e=>msg(e.message,true))}
-function loadOrders(){call('adminListOrders').then(x=>{orders=x;renderOrders()}).catch(e=>msg(e.message,true))}
-function renderOrders(){const q=(document.getElementById('orderSearch')?.value||'').toLocaleLowerCase('tr');document.getElementById('orderRows').innerHTML=orders.filter(r=>[r['Sipariş ID'],r['Müşteri Ad Soyad'],r['Müşteri Telefon']].join(' ').toLocaleLowerCase('tr').includes(q)).map(r=>'<tr><td>'+esc(r['Sipariş ID'])+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Müşteri Telefon'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+tl(r['Toplam Tutar'])+'</td><td>'+esc(r['Teslimat Şekli'])+'</td><td><select onchange="setStatus(\''+escAttr(r['Sipariş ID'])+'\',this.value)"><option '+sel(r['Sipariş Durumu'],'Yeni')+'>Yeni</option><option '+sel(r['Sipariş Durumu'],'Hazırlanıyor')+'>Hazırlanıyor</option><option '+sel(r['Sipariş Durumu'],'Teslimata Hazır')+'>Teslimata Hazır</option><option '+sel(r['Sipariş Durumu'],'Tamamlandı')+'>Tamamlandı</option><option '+sel(r['Sipariş Durumu'],'İptal Edildi')+'>İptal Edildi</option></select></td><td>'+esc(r['Ödeme Durumu'])+'</td><td><button class="secondary" onclick="document.getElementById(\'payOrder\').value=\''+escAttr(r['Sipariş ID'])+'\';tabById(\'payments\')">Ödeme ekle</button></td></tr>').join('')||'<tr><td colspan="9">Sipariş bulunamadı.</td></tr>'}
+function loadDashboard(){call('adminGetDashboard').then(d=>{document.getElementById('orgReadOnlyBanner').classList.toggle('hidden',d.organizationStatus==='Aktif');document.getElementById('mCapacity').textContent=d.capacity+' kg';document.getElementById('mUsed').textContent=d.used.toFixed(1)+' kg';document.getElementById('mRemaining').textContent=d.remaining.toFixed(1)+' kg';document.getElementById('mCollected').textContent=tl(d.collected);document.getElementById('capacityText').textContent=d.used.toFixed(1)+' / '+d.capacity+' kg kullanıldı';document.getElementById('capacityBar').style.width=Math.min(100,d.capacity?d.used/d.capacity*100:0)+'%';document.getElementById('summaryText').innerHTML='Satış: <b>'+d.salesKg.toFixed(1)+' kg</b><br>İkram: <b>'+d.giftKg.toFixed(1)+' kg</b><br>Sipariş: <b>'+d.orderCount+'</b><br>İkram kaydı: <b>'+d.giftCount+'</b><br>Kg fiyatı: <b>'+tl(d.pricePerKg)+'</b><br>Sipariş durumu: <b>'+(d.orderOpen?'Açık':'Kapalı')+'</b>';document.getElementById('recentRows').innerHTML=(d.recentOrders||[]).map(r=>'<tr><td>'+esc(r['Sipariş ID'])+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+(['admin','manager','finance'].includes(currentRole)?tl(r['Toplam Tutar']):'—')+'</td><td>'+esc(r['Sipariş Durumu'])+'</td></tr>').join('')||'<tr><td colspan="5">Henüz kayıt yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function loadOrders(){call('adminListOrders').then(x=>{orders=x;renderOrders();renderQrSelection()}).catch(e=>msg(e.message,true))}
+function renderOrders(){const q=(document.getElementById('orderSearch')?.value||'').toLocaleLowerCase('tr');document.getElementById('orderRows').innerHTML=orders.filter(r=>[r['Sipariş ID'],r['Müşteri Ad Soyad'],r['Müşteri Telefon']].join(' ').toLocaleLowerCase('tr').includes(q)).map(r=>{const id=String(r['Sipariş ID']||'');return '<tr><td>'+esc(id)+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Müşteri Telefon'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+tl(r['Toplam Tutar'])+'</td><td>'+esc(r['Teslimat Şekli'])+'</td><td><select onchange="setStatus(\''+escAttr(id)+'\',this.value)"><option '+sel(r['Sipariş Durumu'],'Yeni')+'>Yeni</option><option '+sel(r['Sipariş Durumu'],'Hazırlanıyor')+'>Hazırlanıyor</option><option '+sel(r['Sipariş Durumu'],'Teslimata Hazır')+'>Teslimata Hazır</option><option '+sel(r['Sipariş Durumu'],'Tamamlandı')+'>Tamamlandı</option><option '+sel(r['Sipariş Durumu'],'İptal Edildi')+'>İptal Edildi</option></select></td><td>'+esc(r['Ödeme Durumu'])+'</td><td class="action-cell"><button class="secondary" onclick="document.getElementById(\'payOrder\').value=\''+escAttr(id)+'\';tabById(\'payments\')">Ödeme ekle</button><button type="button" class="whatsapp-btn" title="Müşteriye WhatsApp mesajı hazırla" aria-label="Müşteriye WhatsApp mesajı hazırla" onclick="openOrderWhatsApp(\''+escAttr(id)+'\')">☏</button></td></tr>'}).join('')||'<tr><td colspan="9">Sipariş bulunamadı.</td></tr>'}
+function renderQrSelection(){
+ const body=document.getElementById('qrOrderRows');if(!body)return;
+ const q=(document.getElementById('qrOrderSearch')?.value||'').toLocaleLowerCase('tr');
+ const st=document.getElementById('qrStatusFilter')?.value||'';
+ const rows=orders.filter(r=>{const hay=[r['Sipariş ID'],r['Müşteri Ad Soyad'],r['Müşteri Telefon']].join(' ').toLocaleLowerCase('tr');return hay.includes(q)&&(!st||String(r['Sipariş Durumu']||'')===st)});
+ body.innerHTML=rows.map(r=>{const id=String(r['Sipariş ID']||'');return '<tr><td><input type="checkbox" class="qr-order-check" data-id="'+escAttr(id)+'" '+(selectedQrOrders.has(id)?'checked':'')+' style="width:auto"></td><td>'+esc(id)+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Müşteri Telefon'])+'</td><td>'+esc(r['Toplam Kilogram'])+' kg</td><td>'+esc(r['Sipariş Durumu'])+'</td></tr>'}).join('')||'<tr><td colspan="6">Aramanıza uygun sipariş bulunamadı.</td></tr>';
+ body.querySelectorAll('.qr-order-check').forEach(el=>el.addEventListener('change',()=>{if(el.checked)selectedQrOrders.add(el.dataset.id);else selectedQrOrders.delete(el.dataset.id);updateQrSelectionCount()}));
+ updateQrSelectionCount();
+}
+function updateQrSelectionCount(){const el=document.getElementById('qrSelectionCount');if(el)el.textContent=selectedQrOrders.size+' sipariş seçildi.'}
+function selectVisibleQr(checked){document.querySelectorAll('#qrOrderRows .qr-order-check').forEach(el=>{el.checked=checked;if(checked)selectedQrOrders.add(el.dataset.id);else selectedQrOrders.delete(el.dataset.id)});updateQrSelectionCount()}
+function qrClean(v){return String(v??'').replace(/^'/,'').trim()}
+function qrTextForOrder(r){
+ const address=[r['Teslimat İlçe'],r['Teslimat Mahalle'],r['Teslimat Açık Adres']].map(qrClean).filter(Boolean).join(', ');
+ const qty=(Number(r['Toplam Kilogram'])||0).toLocaleString('tr-TR')+' kg';
+ return ['Sipariş İsim Soyisim: '+qrClean(r['Müşteri Ad Soyad']),'Sipariş Tel No: '+qrClean(r['Müşteri Telefon']),'Sipariş miktarı: '+qty,'Ödeme yöntemi: '+qrClean(r['Ödeme Yöntemi']),'Teslimat: '+qrClean(r['Teslimat Şekli']),'Teslimat tarihi: '+qrClean(r['Teslimat Tarihi']),'Teslimat adresi: '+(address||'Belirtilmedi'),'Referans ismi soyisim: '+qrClean(r['Referans İsim Soyisim']),'Referans Tel No: '+qrClean(r['Referans Telefon No']),'Sipariş numarası: '+qrClean(r['Sipariş ID'])].join('\n');
+}
+async function printSelectedQrLabels(){
+ if(typeof QRCode==='undefined'||typeof QRCode.toDataURL!=='function'){msg('Yerleşik QR oluşturucu başlatılamadı. Sayfayı yenileyin; sorun sürerse yöneticiye bildirin.',true);return;}
+ const chosen=orders.filter(r=>selectedQrOrders.has(String(r['Sipariş ID']||'')));
+ if(!chosen.length){msg('Yazdırmak için en az bir sipariş seçin.',true);return;}
+ const area=document.getElementById('qrPrintArea');area.innerHTML='';
+ const qrJobs=[];
+ for(let start=0;start<chosen.length;start+=12){
+   const page=document.createElement('div');page.className='qr-page';
+   chosen.slice(start,start+12).forEach(r=>{
+     const label=document.createElement('div');label.className='qr-label';
+     const qr=document.createElement('div');qr.className='qr-code';
+     const img=document.createElement('img');img.alt='Sipariş QR kodu';img.width=420;img.height=420;qr.appendChild(img);
+     const name=document.createElement('div');name.className='qr-name';name.textContent=qrClean(r['Müşteri Ad Soyad'])||'İsimsiz sipariş';
+     label.appendChild(qr);label.appendChild(name);page.appendChild(label);
+     qrJobs.push(QRCode.toDataURL(qrTextForOrder(r),{errorCorrectionLevel:'M',margin:1,width:420}).then(url=>{img.src=url}));
+   });
+   area.appendChild(page);
+ }
+ try{await Promise.all(qrJobs);setTimeout(()=>window.print(),150)}catch(e){area.innerHTML='';msg('QR kodlardan biri oluşturulamadı: '+(e.message||e),true)}
+}
+window.addEventListener('afterprint',()=>{const area=document.getElementById('qrPrintArea');if(area)area.innerHTML=''});
+function whatsappPhone(raw){let n=String(raw||'').replace(/[^0-9]/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.startsWith('0'))n=n.slice(1);if(n.length===10&&n.startsWith('5'))n='90'+n;else if(n.length===11&&n.startsWith('90')){}else if(n.startsWith('90')){}else if(n.length===10)n='90'+n;return n}
+function openWhatsAppDraft(phone,message,personType){const number=whatsappPhone(phone);if(!number||number.length<10){msg(personType+' telefon numarası geçerli görünmüyor. Kayıt telefonunu kontrol edin.',true);return}const url='https://wa.me/'+number+'?text='+encodeURIComponent(message);window.open(url,'_blank','noopener');}
+function waVal(v,fallback='Belirtilmedi'){const t=String(v??'').trim();return t||fallback}
+function openOrderWhatsApp(id){const r=orders.find(x=>String(x['Sipariş ID']||'')===String(id));if(!r){msg('Sipariş kaydı bulunamadı.',true);return}const address=[r['Teslimat İlçe'],r['Teslimat Mahalle'],r['Teslimat Açık Adres']].map(x=>String(x||'').trim()).filter(Boolean).join(', ');const name=waVal(r['Müşteri Ad Soyad'],'Değerli müşterimiz');const text='Merhaba '+name+',\n\nDöner sipariş kaydınızla ilgili bilgilendirme: \nSipariş numarası: '+waVal(r['Sipariş ID'])+'\nSipariş miktarı: '+waVal(r['Toplam Kilogram'])+' kg\nToplam tutar: '+tl(r['Toplam Tutar'])+'\nÖdeme yöntemi: '+waVal(r['Ödeme Yöntemi'])+'\nÖdeme durumu: '+waVal(r['Ödeme Durumu'])+'\nTeslimat: '+waVal(r['Teslimat Şekli'])+'\nTeslimat tarihi: '+waVal(r['Teslimat Tarihi'])+'\nTeslimat adresi: '+(address||'Belirtilmedi')+'\nReferans: '+waVal(r['Referans İsim Soyisim'])+' / '+waVal(r['Referans Telefon No'])+'\n\nİlginiz için teşekkür ederiz.';openWhatsAppDraft(r['Müşteri Telefon'],text,'Müşteri')}
+function openGiftWhatsApp(id){const r=gifts.find(x=>String(x['İkram ID']||'')===String(id));if(!r){msg('İkram kaydı bulunamadı.',true);return}const name=waVal(r['Hayırsever Ad Soyad'],'Değerli hayırseverimiz');const text='Merhaba '+name+',\n\nTalebe ikramınız için teşekkür ederiz. Kayıt bilgileriniz aşağıdadır: \nİkram numarası: '+waVal(r['İkram ID'])+'\nİkram edilen ürün: '+waVal(r['İkram Edilen Ürün'])+'\nPaket/adet: '+waVal(r['Adet / Paket'])+'\nToplam miktar: '+waVal(r['Toplam Kg'])+' kg\nToplam tutar: '+tl(r['Toplam Tutar'])+'\nÖdeme yöntemi: '+waVal(r['Ödeme Yöntemi'])+'\nÖdeme durumu: '+waVal(r['Ödeme Durumu'])+'\nReferans: '+waVal(r['Referans İsim Soyisim'])+' / '+waVal(r['Referans Telefon No'])+'\n\nAllah kabul etsin. Desteğiniz için gönülden teşekkür ederiz.';openWhatsAppDraft(r['Telefon'],text,'Hayırsever')}
 function setStatus(id,status){call('adminUpdateOrder',id,{'Sipariş Durumu':status}).then(()=>{msg('Sipariş durumu güncellendi.');loadDashboard()}).catch(e=>msg(e.message,true))}
 function tabById(id){const b=document.querySelector('[data-tab="'+id+'"]');tab(id,b)}
-function loadGifts(){call('adminListIkram').then(x=>{gifts=x;document.getElementById('giftRows').innerHTML=x.map(r=>`<tr><td>${esc(r['İkram ID'])}</td><td>${esc(r['Hayırsever Ad Soyad'])}</td><td>${esc(r['İkram Edilen Ürün'])}</td><td>${esc(r['Adet / Paket'])}</td><td>${esc(r['Toplam Kg'])}</td><td>${tl(r['Toplam Tutar'])}</td><td>${esc(r['Ödeme Yöntemi'])}</td><td>${esc(r['Ödeme Durumu']||'Bekliyor')}</td><td><select onchange="setGiftStatus('${escAttr(r['İkram ID'])}',this.value)"><option ${sel(r['İkram Durumu'],'Yeni')}>Yeni</option><option ${sel(r['İkram Durumu'],'Hazırlanıyor')}>Hazırlanıyor</option><option ${sel(r['İkram Durumu'],'Dağıtıma Hazır')}>Dağıtıma Hazır</option><option ${sel(r['İkram Durumu'],'Tamamlandı')}>Tamamlandı</option><option ${sel(r['İkram Durumu'],'İptal Edildi')}>İptal Edildi</option></select></td><td><button class="secondary" onclick="document.getElementById('payOrder').value='${escAttr(r['İkram ID'])}';tabById('payments')">Ödeme ekle</button></td></tr>`).join('')||'<tr><td colspan="10">Henüz ikram kaydı yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function loadGifts(){call('adminListIkram').then(x=>{gifts=x;const opts=['Yeni','Onaylandı','Hazırlanıyor','Hazırlandı','Dağıtıma Çıktı','Teslim Edildi','İptal Edildi'];document.getElementById('giftRows').innerHTML=x.map(r=>{const id=String(r['İkram ID']||''),raw=String(r['İkram Durumu']||'Yeni'),status=raw==='Tamamlandı'?'Teslim Edildi':raw==='Dağıtıma Hazır'?'Hazırlandı':raw;const statusCell=['admin','manager','operations'].includes(currentRole)?`<select onchange="setGiftStatus('${escAttr(id)}',this.value)">${opts.map(x=>`<option ${sel(status,x)}>${x}</option>`).join('')}</select>`:esc(status);return `<tr><td>${esc(id)}</td><td>${esc(r['Hayırsever Ad Soyad'])}</td><td>${esc(r['İkram Edilen Ürün'])}</td><td>${esc(r['Adet / Paket'])}</td><td>${esc(r['Toplam Kg'])}</td><td>${tl(r['Toplam Tutar'])}</td><td>${esc(r['Ödeme Yöntemi'])}</td><td>${esc(r['Ödeme Durumu']||'Bekliyor')}</td><td>${statusCell}</td><td class="action-cell">${canManagePayments()?`<button class="secondary" onclick="document.getElementById('payOrder').value='${escAttr(id)}';tabById('payments')">Ödeme ekle</button>`:''}${['admin','manager','operations'].includes(currentRole)?`<button type="button" class="whatsapp-btn" onclick="openGiftWhatsApp('${escAttr(id)}')">☏</button>`:''}${canEditRecords()&&Number(r['Paketlenen Kg']||0)===0&&!['Hazırlandı','Dağıtıma Çıktı','Teslim Edildi','İptal Edildi'].includes(status)?`<button class="secondary" onclick="editGift('${escAttr(id)}')">Düzenle</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="10">Henüz ikram kaydı yok.</td></tr>'}).catch(e=>msg(e.message,true))}
 function setGiftStatus(id,status){call('adminUpdateGift',id,{'İkram Durumu':status}).then(()=>{msg('İkram durumu güncellendi.');loadDashboard()}).catch(e=>msg(e.message,true))}
 function loadPayments(){call('adminListPayments').then(x=>{document.getElementById('paymentRows').innerHTML=x.map(r=>'<tr><td>'+esc(r['Ödeme ID'])+'</td><td>'+esc(r['Sipariş ID'])+'</td><td>'+esc(r['Kayıt Türü']||(String(r['Sipariş ID']||'').startsWith('I-')?'İkram':'Satış'))+'</td><td>'+esc(r['Tarih'])+'</td><td>'+tl(r['Tutar'])+'</td><td>'+esc(r['Yöntem'])+'</td><td>'+esc(r['Durum'])+'</td><td>'+esc(r['Kaydeden'])+'</td></tr>').join('')||'<tr><td colspan="8">Henüz ödeme kaydı yok.</td></tr>'}).catch(e=>msg(e.message,true))}
 function addPayment(){call('adminAddPayment',{orderId:document.getElementById('payOrder').value.trim(),amount:document.getElementById('payAmount').value,method:document.getElementById('payMethod').value,note:document.getElementById('payNote').value}).then(()=>{msg('Ödeme kaydedildi.');loadPayments();loadOrders();loadDashboard()}).catch(e=>msg(e.message,true))}
@@ -49,4 +1501,64 @@ function addStaff(){call('adminAddStaff',{name:document.getElementById('staffNam
 function toggleStaff(id,a){call('adminSetStaffActive',id,a).then(loadStaff).catch(e=>msg(e.message,true))}
 function sel(a,b){return String(a||'')===b?'selected':''}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function escAttr(v){return esc(v).replace(/\n/g,' ')}
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
-</script></body></html>
+</script>
+<script>
+let currentRole='',currentUserId='',qrStream=null,qrScanActive=false,qrDetector=null;
+function canEditRecords(){return ['admin','manager'].includes(currentRole)}
+function applyRoleUi(){const allow={admin:['dashboard','orders','qrlabels','gifts','payments','cuts','packing','delivery','settings','staff','notifications','tasks','reports','archives'],manager:['dashboard','orders','qrlabels','gifts','payments','cuts','packing','delivery','settings','notifications','tasks','reports','archives'],finance:['dashboard','orders','gifts','payments','notifications','tasks','reports'],operations:['dashboard','orders','qrlabels','gifts','cuts','packing','delivery','notifications','tasks'],preparation:['dashboard','cuts','notifications','tasks'],packing:['dashboard','orders','qrlabels','packing','notifications','tasks'],delivery:['dashboard','orders','qrlabels','delivery','notifications','tasks']};const set=allow[currentRole]||['dashboard'];document.querySelectorAll('.nav [data-tab]').forEach(b=>b.classList.toggle('hidden',!set.includes(b.dataset.tab)));document.getElementById('mCollected').closest('.card').classList.toggle('hidden',!['admin','manager','finance'].includes(currentRole));document.getElementById('taskCreateCard').classList.toggle('hidden',!['admin','manager','operations'].includes(currentRole));document.getElementById('newOrgCard').classList.toggle('hidden',currentRole!=='admin');document.getElementById('auditCard').classList.toggle('hidden',!['admin','manager'].includes(currentRole));document.getElementById('organizationSelect').classList.toggle('hidden',!['admin','manager'].includes(currentRole));}
+function login(){const u=document.getElementById('username').value,p=document.getElementById('password').value;loadingStart('Yönetici oturumu doğrulanıyor');google.script.run.withSuccessHandler(r=>{token=r.token;currentRole=r.role;currentUserId=r.userId||'';document.getElementById('loginView').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userLine').textContent=r.name+' · '+r.role+' · V3.0';applyRoleUi();loadAll();loadingEnd();}).withFailureHandler(e=>{loadingEnd();const el=document.getElementById('loginMsg');el.textContent=e.message||e;el.classList.remove('hidden');el.classList.add('error');}).adminLogin(u,p)}
+function tab(id,btn){document.querySelectorAll('.pane').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='orders'||id==='qrlabels')loadOrders();if(id==='gifts')loadGifts();if(id==='payments')loadPayments();if(id==='cuts')loadCuts();if(id==='packing')loadPacking();if(id==='delivery')loadDelivery();if(id==='settings')loadSettings();if(id==='staff')loadStaff();if(id==='notifications')loadNotifications();if(id==='tasks')loadTasks();if(id==='reports')loadReports();if(id==='archives')loadOrganizations()}
+function loadAll(){loadDashboard();loadOrders();loadNotifications();if(['admin','manager'].includes(currentRole)){loadSettings();loadOrganizations();loadStaffForTasks()}}
+function loadDashboard(){call('adminGetDashboard').then(d=>{document.getElementById('orgReadOnlyBanner').classList.toggle('hidden',d.organizationStatus==='Aktif');document.getElementById('mCapacity').textContent=d.capacity+' kg';document.getElementById('mUsed').textContent=d.used.toFixed(1)+' kg';document.getElementById('mRemaining').textContent=d.remaining.toFixed(1)+' kg';document.getElementById('mCollected').textContent=tl(d.collected);document.getElementById('capacityText').textContent=d.used.toFixed(1)+' / '+d.capacity+' kg kullanıldı';document.getElementById('capacityBar').style.width=Math.min(100,d.capacity?d.used/d.capacity*100:0)+'%';document.getElementById('summaryText').innerHTML='Organizasyon: <b>'+esc(d.organization)+'</b><br>Satış: <b>'+d.salesKg.toFixed(1)+' kg</b><br>İkram: <b>'+d.giftKg.toFixed(1)+' kg</b><br>Sipariş: <b>'+d.orderCount+'</b><br>İkram kaydı: <b>'+d.giftCount+'</b><br>Kesim planı: <b>'+(d.plannedCutKg||0).toFixed(1)+' kg</b> (tamamlanan: <b>'+(d.completedCutKg||0).toFixed(1)+' kg</b>)<br>Paketlenen: <b>'+(d.packedKg||0).toFixed(1)+' kg</b><br>Teslimat: <b>'+d.deliveredCount+'</b><br>Açık görev: <b>'+d.taskOpenCount+'</b>'+(['admin','manager','finance'].includes(currentRole)?'<br>Kalan tahsilat: <b>'+tl(d.outstanding)+'</b><br>Kg fiyatı: <b>'+tl(d.pricePerKg)+'</b>':'')+'<br>Sipariş alımı: <b>'+(d.orderOpen?'Açık':'Kapalı')+'</b>';document.getElementById('recentRows').innerHTML=(d.recentOrders||[]).map(r=>'<tr><td>'+esc(r['Sipariş ID'])+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+(['admin','manager','finance'].includes(currentRole)?tl(r['Toplam Tutar']):'—')+'</td><td>'+esc(r['Sipariş Durumu'])+'</td></tr>').join('')||'<tr><td colspan="5">Henüz kayıt yok.</td></tr>';document.getElementById('attentionRows').innerHTML=(d.attention||[]).map(x=>'<div class="attention-item"><strong>'+esc(x.type)+'</strong>'+esc(x.text)+' '+(x.id?'<span class="muted small">('+esc(x.id)+')</span>':'')+'</div>').join('')||'<div class="notice">Şu anda dikkat gerektiren açık işlem bulunmuyor.</div>'}).catch(e=>msg(e.message,true))}
+function renderOrders(){const q=(document.getElementById('orderSearch')?.value||'').toLocaleLowerCase('tr'),opts=['Yeni','Onaylandı','Hazırlanıyor','Paketlendi','Teslimata Hazır','Teslimata Çıktı','Teslim Edildi','İptal Edildi'];document.getElementById('orderRows').innerHTML=orders.filter(r=>[r['Sipariş ID'],r['Müşteri Ad Soyad'],r['Müşteri Telefon']].join(' ').toLocaleLowerCase('tr').includes(q)).map(r=>{const id=String(r['Sipariş ID']||''),raw=String(r['Sipariş Durumu']||'Yeni'),status=raw==='Tamamlandı'?'Teslim Edildi':raw==='Dağıtıma Hazır'?'Teslimata Hazır':raw;const statusCell=['admin','manager','operations'].includes(currentRole)?'<select onchange="setStatus(\''+escAttr(id)+'\',this.value)">'+opts.map(x=>'<option '+sel(status,x)+'>'+x+'</option>').join('')+'</select>':esc(status);return '<tr><td>'+esc(id)+'</td><td>'+esc(r['Müşteri Ad Soyad'])+'</td><td>'+esc(r['Müşteri Telefon'])+'</td><td>'+esc(r['Toplam Kilogram'])+'</td><td>'+tl(r['Toplam Tutar'])+'</td><td>'+esc(r['Teslimat Şekli'])+'</td><td>'+statusCell+'</td><td>'+esc(r['Ödeme Durumu'])+'</td><td class="action-cell">'+(canManagePayments()?'<button class="secondary" onclick="document.getElementById(\'payOrder\').value=\''+escAttr(id)+'\';tabById(\'payments\')">Ödeme ekle</button>':'')+(canWhatsAppRecords()?'<button type="button" class="whatsapp-btn" onclick="openOrderWhatsApp(\''+escAttr(id)+'\')">☏</button>':'')+(canEditRecords()&&Number(r['Paketlenen Kg']||0)===0&&!['Paketlendi','Teslimata Hazır','Teslimata Çıktı','Teslim Edildi','İptal Edildi'].includes(status)?'<button class="secondary" onclick="editOrder(\''+escAttr(id)+'\')">Düzenle</button>':'')+'</td></tr>'}).join('')||'<tr><td colspan="9">Sipariş bulunamadı.</td></tr>'}
+function loadGifts(){call('adminListIkram').then(x=>{gifts=x;const opts=['Yeni','Onaylandı','Hazırlanıyor','Hazırlandı','Dağıtıma Çıktı','Teslim Edildi','İptal Edildi'];document.getElementById('giftRows').innerHTML=x.map(r=>{const id=String(r['İkram ID']||''),raw=String(r['İkram Durumu']||'Yeni'),status=raw==='Tamamlandı'?'Teslim Edildi':raw==='Dağıtıma Hazır'?'Hazırlandı':raw;const statusCell=['admin','manager','operations'].includes(currentRole)?`<select onchange="setGiftStatus('${escAttr(id)}',this.value)">${opts.map(x=>`<option ${sel(status,x)}>${x}</option>`).join('')}</select>`:esc(status);return `<tr><td>${esc(id)}</td><td>${esc(r['Hayırsever Ad Soyad'])}</td><td>${esc(r['İkram Edilen Ürün'])}</td><td>${esc(r['Adet / Paket'])}</td><td>${esc(r['Toplam Kg'])}</td><td>${tl(r['Toplam Tutar'])}</td><td>${esc(r['Ödeme Yöntemi'])}</td><td>${esc(r['Ödeme Durumu']||'Bekliyor')}</td><td>${statusCell}</td><td class="action-cell">${canManagePayments()?`<button class="secondary" onclick="document.getElementById('payOrder').value='${escAttr(id)}';tabById('payments')">Ödeme ekle</button>`:''}${['admin','manager','operations'].includes(currentRole)?`<button type="button" class="whatsapp-btn" onclick="openGiftWhatsApp('${escAttr(id)}')">☏</button>`:''}${canEditRecords()&&Number(r['Paketlenen Kg']||0)===0&&!['Hazırlandı','Dağıtıma Çıktı','Teslim Edildi','İptal Edildi'].includes(status)?`<button class="secondary" onclick="editGift('${escAttr(id)}')">Düzenle</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="10">Henüz ikram kaydı yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function setStatus(id,status){call('adminUpdateOrder',id,{'Sipariş Durumu':status}).then(()=>{msg('Sipariş durumu güncellendi.');loadOrders();loadDashboard()}).catch(e=>{msg(e.message,true);loadOrders()})}
+function setGiftStatus(id,status){call('adminUpdateGift',id,{'İkram Durumu':status}).then(()=>{msg('İkram durumu güncellendi.');loadGifts();loadDashboard()}).catch(e=>{msg(e.message,true);loadGifts()})}
+function addPayment(){call('adminAddPayment',{orderId:document.getElementById('payOrder').value.trim(),amount:document.getElementById('payAmount').value,method:document.getElementById('payMethod').value,note:document.getElementById('payNote').value}).then(()=>{msg('Ödeme kaydedildi.');document.getElementById('payAmount').value='';document.getElementById('payNote').value='';loadPayments();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function addPacking(){call('adminAddPacking',{recordId:document.getElementById('packRecordId').value.trim(),recordType:document.getElementById('packRecordType').value,packType:document.getElementById('packType').value,count:document.getElementById('packCount').value,kg:document.getElementById('packKg').value,note:document.getElementById('packNote').value}).then(r=>{msg('Paketleme kaydedildi. Paketlenen: '+r.packedKg+' kg · Kalan: '+r.remainingKg+' kg');loadPacking();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function addDelivery(){call('adminAddDelivery',{recordId:document.getElementById('deliveryRecordId').value.trim(),recordType:document.getElementById('deliveryRecordType').value,date:document.getElementById('deliveryDate').value,type:document.getElementById('deliveryType').value,address:document.getElementById('deliveryAddress').value,staff:document.getElementById('deliveryStaff').value,note:document.getElementById('deliveryNote').value}).then(()=>{msg('Teslimat planlandı.');loadDelivery();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function updateDelivery(id,status){let receiver='';if(status==='Teslim Edildi'){receiver=prompt('Teslim alan kişinin adını girin:')||'';if(!receiver.trim()){msg('Teslim alan kişi adı zorunludur.',true);return}}call('adminUpdateDelivery',id,status,receiver).then(()=>{msg('Teslimat güncellendi.');loadDelivery();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function loadNotifications(){call('adminListNotifications').then(rows=>{const unread=rows.filter(r=>String(r['Okundu'])!=='true').length;document.getElementById('notificationBadge').textContent=unread?'('+unread+')':'';document.getElementById('notificationRows').innerHTML=rows.map(r=>`<tr class="${String(r['Okundu'])==='true'?'':'notification-unread'}"><td>${esc(r['Tarih'])}</td><td>${esc(r['Tür'])}</td><td>${esc(r['Başlık'])}</td><td>${esc(r['Mesaj'])}</td><td>${String(r['Okundu'])==='true'?'Okundu':'Yeni'}</td><td>${String(r['Okundu'])==='true'?'':`<button class="secondary" onclick="markNotificationRead('${escAttr(r['Bildirim ID'])}')">Okundu işaretle</button>`}</td></tr>`).join('')||'<tr><td colspan="6">Bildirim yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function markNotificationRead(id){call('adminMarkNotificationRead',id).then(loadNotifications).catch(e=>msg(e.message,true))}
+function loadStaffForTasks(){call('adminListStaff').then(rows=>{const el=document.getElementById('taskAssignee');if(el)el.innerHTML='<option value="">Role göre ata</option>'+rows.filter(r=>r.active!==false&&String(r.active)!=='false').map(r=>`<option value="${escAttr(r.id)}">${esc(r.name)} · ${esc(r.role)}</option>`).join('')}).catch(()=>{})}
+function loadTasks(){call('adminListTasks').then(rows=>{document.getElementById('taskRows').innerHTML=rows.map(r=>`<tr><td><strong>${esc(r['Başlık'])}</strong><div class="muted small">${esc(r['Açıklama'])}</div></td><td>${esc(r['Öncelik'])}</td><td>${esc(r['Atanan Personel']||'Role göre')}</td><td>${esc(r['Hedef Rol'])}</td><td>${esc(r['Son Tarih'])}</td><td>${esc(r['İlgili Kayıt ID'])}</td><td><select onchange="updateTask('${escAttr(r['Görev ID'])}',this.value)">${['Yeni','Devam Ediyor','Bekliyor','Tamamlandı','İptal Edildi'].map(x=>`<option ${sel(r['Durum'],x)}>${x}</option>`).join('')}</select></td></tr>`).join('')||'<tr><td colspan="7">Görev bulunamadı.</td></tr>'}).catch(e=>msg(e.message,true));if(['admin','manager'].includes(currentRole))loadStaffForTasks()}
+function createTask(){call('adminCreateTask',{title:document.getElementById('taskTitle').value,description:document.getElementById('taskDescription').value,priority:document.getElementById('taskPriority').value,dueDate:document.getElementById('taskDueDate').value,assigneeId:document.getElementById('taskAssignee').value,role:document.getElementById('taskRole').value,recordId:document.getElementById('taskRecordId').value}).then(()=>{msg('Görev oluşturuldu.');['taskTitle','taskDescription','taskDueDate','taskRecordId'].forEach(id=>document.getElementById(id).value='');loadTasks();loadNotifications();loadDashboard()}).catch(e=>msg(e.message,true))}
+function updateTask(id,status){call('adminUpdateTask',id,{Durum:status}).then(()=>{msg('Görev güncellendi.');loadTasks();loadDashboard()}).catch(e=>msg(e.message,true))}
+function loadReports(){call('adminGetReport').then(r=>{document.getElementById('rExpected').textContent=tl(r.expectedTotal);document.getElementById('rCollected').textContent=tl(r.collected);document.getElementById('rOutstanding').textContent=tl(r.outstanding);document.getElementById('rKg').textContent=r.totalKg.toFixed(1)+' kg';document.getElementById('reportSummary').innerHTML='<b>'+esc(r.organization)+'</b><br>Sipariş: '+r.orderCount+' · İkram: '+r.giftCount+'<br>Satış tutarı: '+tl(r.salesTotal)+' · İkram tutarı: '+tl(r.giftTotal)+'<br>Kesim planı: '+(r.plannedCutKg||0).toFixed(1)+' kg · Tamamlanan kesim: '+(r.completedCutKg||0).toFixed(1)+' kg<br>Teslim edilen sipariş: '+r.deliveredOrders+' · Teslim edilen ikram: '+r.deliveredGifts+'<br>İptal edilen sipariş: '+r.cancelledOrders+' · İptal edilen ikram: '+r.cancelledGifts+'<br>Başarısız teslimat: '+r.deliveryFailed+'<br>Rapor zamanı: '+esc(r.generatedAt)}).catch(e=>msg(e.message,true));if(['admin','manager'].includes(currentRole))loadAudit()}
+function loadAudit(){call('adminListAudit').then(rows=>{document.getElementById('auditRows').innerHTML=rows.map(r=>`<tr><td>${esc(r['Tarih'])}</td><td>${esc(r['İşlem'])}</td><td>${esc(r['Kayıt ID'])}</td><td>${esc(r['Detay'])}</td><td>${esc(r['Kullanıcı'])}</td><td>${esc(r['Eski Değer'])}</td><td>${esc(r['Yeni Değer'])}</td></tr>`).join('')||'<tr><td colspan="7">İşlem geçmişi bulunamadı.</td></tr>'}).catch(e=>msg(e.message,true))}
+function loadOrganizations(){call('adminListOrganizations').then(rows=>{const selEl=document.getElementById('organizationSelect');selEl.innerHTML=rows.map(r=>`<option value="${escAttr(r['Organizasyon ID'])}" ${r['Aktif Görünüm']?'selected':''}>${esc(r['Organizasyon Adı'])}${r['Durum']==='Arşiv'?' · Arşiv':''}</option>`).join('');document.getElementById('organizationRows').innerHTML=rows.map(r=>`<tr><td>${esc(r['Organizasyon Adı'])}</td><td>${esc(r['Başlangıç Tarihi'])}</td><td>${esc(r['Bitiş Tarihi'])}</td><td>${esc(r['Kapasite Kg'])} kg</td><td>${tl(r['Kg Fiyatı'])}</td><td>${esc(r['Durum'])}</td><td>${r['Aktif Görünüm']?'<span class="status-pill">Görüntüleniyor</span>':`<button class="secondary" onclick="switchOrganization('${escAttr(r['Organizasyon ID'])}')">Görüntüle</button>`}</td></tr>`).join('')||'<tr><td colspan="7">Organizasyon yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function switchOrganization(id){if(!id)return;const active=document.querySelector('.pane:not(.hidden)')?.id;call('adminSwitchOrganization',id).then(()=>{msg('Organizasyon görünümü değiştirildi.');loadOrganizations();loadAll();if(active==='gifts')loadGifts();if(active==='payments')loadPayments();if(active==='cuts')loadCuts();if(active==='packing')loadPacking();if(active==='delivery')loadDelivery();if(active==='tasks')loadTasks();if(active==='reports')loadReports();if(active==='notifications')loadNotifications();if(active==='settings')loadSettings();}).catch(e=>msg(e.message,true))}
+function createOrganization(){call('adminCreateOrganization',{name:document.getElementById('orgName').value,startDate:document.getElementById('orgStartDate').value,capacity:document.getElementById('orgCapacity').value,price:document.getElementById('orgPrice').value}).then(()=>{msg('Yeni organizasyon açıldı. Önceki dönem arşivlendi.');document.getElementById('orgName').value='';loadOrganizations();loadAll()}).catch(e=>msg(e.message,true))}
+function dateInputValue(v){const s=String(v||'').trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const m=s.match(/^(\d{2})\.(\d{2})\.(\d{4})/);return m?m[3]+'-'+m[2]+'-'+m[1]:''}
+function editOrder(id){const r=orders.find(x=>String(x['Sipariş ID'])===String(id));if(!r)return;document.getElementById('editRecordId').value=id;document.getElementById('editName').value=r['Müşteri Ad Soyad']||'';document.getElementById('editPhone').value=String(r['Müşteri Telefon']||'').replace(/^'/,'');document.getElementById('edit1Kg').value=Number(r['1 Kg Paket Adedi'])||0;document.getElementById('editHalfKg').value=Number(r['Yarım Kg Paket Adedi'])||0;document.getElementById('editDeliveryType').value=r['Teslimat Şekli']||'Gel-Al';document.getElementById('editDeliveryDate').value=dateInputValue(r['Teslimat Tarihi']);document.getElementById('editDistrict').value=r['Teslimat İlçe']||'';document.getElementById('editNeighborhood').value=r['Teslimat Mahalle']||'';document.getElementById('editAddress').value=r['Teslimat Açık Adres']||'';document.getElementById('editNotes').value=r['Notlar']||'';const m=document.getElementById('recordEditModal');m.classList.remove('hidden');m.style.display='flex'}
+function closeRecordEdit(){const m=document.getElementById('recordEditModal');m.classList.add('hidden');m.style.display='none'}
+function saveOrderEdit(){const id=document.getElementById('editRecordId').value,p={'Müşteri Ad Soyad':document.getElementById('editName').value,'Müşteri Telefon':document.getElementById('editPhone').value,'1 Kg Paket Adedi':document.getElementById('edit1Kg').value,'Yarım Kg Paket Adedi':document.getElementById('editHalfKg').value,'Teslimat Şekli':document.getElementById('editDeliveryType').value,'Teslimat Tarihi':document.getElementById('editDeliveryDate').value,'Teslimat İlçe':document.getElementById('editDistrict').value,'Teslimat Mahalle':document.getElementById('editNeighborhood').value,'Teslimat Açık Adres':document.getElementById('editAddress').value,'Notlar':document.getElementById('editNotes').value};call('adminUpdateOrder',id,p).then(()=>{msg('Sipariş bilgileri güncellendi. Değişiklik geçmişine kaydedildi.');closeRecordEdit();loadOrders();loadDashboard()}).catch(e=>msg(e.message,true))}
+function confirmQrDelivery(){const val=document.getElementById('qrScanInput').value.trim();if(!val){msg('Önce QR içeriğini okutun veya kayıt numarasını girin.',true,'qrScanMsg');return}call('adminConfirmQrDelivery',val,document.getElementById('qrReceiver').value).then(r=>{msg('Teslimat doğrulandı: '+r.id,false,'qrScanMsg');document.getElementById('qrScanInput').value='';document.getElementById('qrReceiver').value='';loadDelivery();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true,'qrScanMsg'))}
+async function startQrScanner(){if(!navigator.mediaDevices?.getUserMedia||typeof BarcodeDetector==='undefined'){msg('Bu tarayıcıda kamera QR okuma desteklenmiyor. QR içeriğini elle yapıştırabilirsiniz.',true,'qrScanMsg');return}try{qrStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});const v=document.getElementById('qrVideo');v.srcObject=qrStream;v.classList.add('qr-video-active');await v.play();qrDetector=new BarcodeDetector({formats:['qr_code']});qrScanActive=true;scanQrFrame()}catch(e){msg('Kamera açılamadı. Tarayıcı izinlerini kontrol edin veya QR metnini elle girin.',true,'qrScanMsg')}}
+async function scanQrFrame(){if(!qrScanActive||!qrDetector)return;try{const codes=await qrDetector.detect(document.getElementById('qrVideo'));if(codes&&codes.length){document.getElementById('qrScanInput').value=codes[0].rawValue;stopQrScanner();msg('QR kod okundu. Teslimatı doğrulamak için butona basın.',false,'qrScanMsg');return}}catch(e){}setTimeout(scanQrFrame,250)}
+function stopQrScanner(){qrScanActive=false;if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null}const v=document.getElementById('qrVideo');if(v){v.pause();v.srcObject=null;v.classList.remove('qr-video-active')}}
+
+function canWhatsAppRecords(){return ['admin','manager','operations','delivery'].includes(currentRole)}
+function canManagePayments(){return ['admin','manager','finance'].includes(currentRole)}
+function loadPayments(){call('adminListPayments').then(rows=>{document.getElementById('paymentRows').innerHTML=rows.map(r=>'<tr><td>'+esc(r['Ödeme ID'])+'</td><td>'+esc(r['İlgili Kayıt ID']||r['Sipariş ID'])+'</td><td>'+esc(r['Kayıt Türü']||(String(r['Sipariş ID']||'').startsWith('I-')?'İkram':'Satış'))+'</td><td>'+esc(r['Tarih'])+'</td><td>'+tl(r['Tutar'])+'</td><td>'+esc(r['Yöntem'])+'</td><td>'+esc(r['Durum'])+'</td><td>'+esc(r['Kaydeden'])+'</td><td>'+(['İptal','İade Edildi'].includes(r['Durum'])?esc(r['Durum']):`<button class="danger" onclick="cancelPayment('${escAttr(r['Ödeme ID'])}')">Hatalı kaydı iptal et</button><button class="secondary" onclick="refundPayment('${escAttr(r['Ödeme ID'])}')">İade edildi</button>`)+'</td></tr>').join('')||'<tr><td colspan="9">Henüz ödeme kaydı yok.</td></tr>'}).catch(e=>msg(e.message,true))}
+function cancelPayment(id){const reason=prompt('Bu tahsilatı neden iptal ediyorsunuz? İade / düzeltme gerekçesini yazın:');if(reason===null)return;if(!reason.trim()){msg('İptal gerekçesi zorunludur.',true);return}if(!confirm('Bu ödeme kaydı iptal edilecek. İşlem geçmişinde saklanacak. Devam edilsin mi?'))return;call('adminCancelPayment',id,reason.trim()).then(()=>{msg('Ödeme iptal edildi. Kayıt silinmedi; ödeme durumu yeniden hesaplandı.');loadPayments();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function refundPayment(id){const reason=prompt('Gerçek iade işlemi tamamlandı mı? İade gerekçesini yazın:');if(reason===null)return;if(!reason.trim()){msg('İade gerekçesi zorunludur.',true);return}if(!confirm('Bu tahsilat İade Edildi olarak işaretlenecek ve tahsilat toplamından düşülecek. Banka/nakit iadesini sistem dışında gerçekten tamamladıysanız devam edin.'))return;call('adminRefundPayment',id,reason.trim()).then(()=>{msg('Ödeme iade edildi olarak kaydedildi.');loadPayments();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function logout(){stopQrScanner();google.script.run.adminLogout(token);token='';currentRole='';currentUserId='';document.getElementById('app').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden');document.getElementById('password').value=''}
+
+const pendingAdminKeys={payment:null,packing:null,cut:null,task:null,delivery:null};
+function adminNewKey(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2))}
+function adminKey(kind){if(!pendingAdminKeys[kind])pendingAdminKeys[kind]=adminNewKey();return pendingAdminKeys[kind]}
+function resetAdminKey(kind){pendingAdminKeys[kind]=null}
+[['payOrder','payment'],['payAmount','payment'],['payMethod','payment'],['payNote','payment'],['packRecordId','packing'],['packRecordType','packing'],['packType','packing'],['packCount','packing'],['packKg','packing'],['packNote','packing'],['cutDate','cut'],['cutKg','cut'],['cutNote','cut'],['taskTitle','task'],['taskDescription','task'],['taskPriority','task'],['taskDueDate','task'],['taskAssignee','task'],['taskRole','task'],['taskRecordId','task'],['deliveryRecordId','delivery'],['deliveryRecordType','delivery'],['deliveryDate','delivery'],['deliveryType','delivery'],['deliveryAddress','delivery'],['deliveryStaff','delivery'],['deliveryNote','delivery']].forEach(([id,kind])=>{const el=document.getElementById(id);if(el){el.addEventListener('input',()=>resetAdminKey(kind));el.addEventListener('change',()=>resetAdminKey(kind))}});
+function loadSettings(){call('adminGetSettings').then(s=>{settings=s;['pricePerKg','capacityKg','accountName','iban','pickupAddress','contactPhone','salesCapacityKg','publicNotice'].forEach(k=>{const el=document.getElementById('s_'+k);if(el)el.value=s[k]??''});['orderOpen','deliveryEnabled','pickupEnabled','cashEnabled','bankEnabled'].forEach(k=>{const el=document.getElementById('s_'+k);if(el)el.checked=String(s[k])!=='false'});document.getElementById('orgCapacity').value=s.capacityKg||400;document.getElementById('orgPrice').value=s.pricePerKg||0;}).catch(e=>msg(e.message,true))}
+function addPayment(){const p={orderId:document.getElementById('payOrder').value.trim(),amount:document.getElementById('payAmount').value,method:document.getElementById('payMethod').value,note:document.getElementById('payNote').value,requestKey:adminKey('payment')};call('adminAddPayment',p).then(r=>{pendingAdminKeys.payment=null;msg(r.duplicate?'Bu ödeme isteği daha önce kaydedilmiş; tekrar eklenmedi.':'Ödeme kaydedildi.');document.getElementById('payAmount').value='';document.getElementById('payNote').value='';loadPayments();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function addPacking(){const p={recordId:document.getElementById('packRecordId').value.trim(),recordType:document.getElementById('packRecordType').value,packType:document.getElementById('packType').value,count:document.getElementById('packCount').value,kg:document.getElementById('packKg').value,note:document.getElementById('packNote').value,requestKey:adminKey('packing')};call('adminAddPacking',p).then(r=>{pendingAdminKeys.packing=null;msg(r.duplicate?'Bu paketleme isteği daha önce kaydedilmiş; tekrar eklenmedi.':'Paketleme kaydedildi. Paketlenen: '+r.packedKg+' kg · Kalan: '+r.remainingKg+' kg');loadPacking();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function addCut(){const p={date:document.getElementById('cutDate').value,kg:document.getElementById('cutKg').value,note:document.getElementById('cutNote').value,requestKey:adminKey('cut')};call('adminAddCut',p).then(r=>{pendingAdminKeys.cut=null;msg(r.duplicate?'Bu kesim planı isteği daha önce kaydedilmiş.':'Kesim planı kaydedildi.');loadCuts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function addDelivery(){const p={recordId:document.getElementById('deliveryRecordId').value.trim(),recordType:document.getElementById('deliveryRecordType').value,date:document.getElementById('deliveryDate').value,type:document.getElementById('deliveryType').value,address:document.getElementById('deliveryAddress').value,staff:document.getElementById('deliveryStaff').value,note:document.getElementById('deliveryNote').value,requestKey:adminKey('delivery')};call('adminAddDelivery',p).then(r=>{pendingAdminKeys.delivery=null;msg(r.duplicate?'Bu teslimat planı daha önce oluşturulmuş.':'Teslimat planlandı.');loadDelivery();loadOrders();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+function createTask(){const p={title:document.getElementById('taskTitle').value,description:document.getElementById('taskDescription').value,priority:document.getElementById('taskPriority').value,dueDate:document.getElementById('taskDueDate').value,assigneeId:document.getElementById('taskAssignee').value,role:document.getElementById('taskRole').value,recordId:document.getElementById('taskRecordId').value,requestKey:adminKey('task')};call('adminCreateTask',p).then(r=>{pendingAdminKeys.task=null;msg(r.duplicate?'Bu görev isteği daha önce kaydedilmiş.':'Görev oluşturuldu.');['taskTitle','taskDescription','taskDueDate','taskRecordId'].forEach(id=>document.getElementById(id).value='');loadTasks();loadNotifications();loadDashboard()}).catch(e=>msg(e.message,true))}
+
+function editGift(id){const r=gifts.find(x=>String(x['İkram ID'])===String(id));if(!r)return;document.getElementById('editGiftId').value=id;document.getElementById('editGiftName').value=r['Hayırsever Ad Soyad']||'';document.getElementById('editGiftPhone').value=String(r['Telefon']||'').replace(/^'/,'');document.getElementById('editGiftProduct').value=r['İkram Edilen Ürün']||'Talebeye 1 Kg İkram';document.getElementById('editGiftQty').value=Number(r['Adet / Paket'])||1;document.getElementById('editGiftNote').value=r['İkram / Dua Notu']||'';const m=document.getElementById('giftEditModal');m.classList.remove('hidden');m.style.display='flex'}
+function closeGiftEdit(){const m=document.getElementById('giftEditModal');m.classList.add('hidden');m.style.display='none'}
+function saveGiftEdit(){const id=document.getElementById('editGiftId').value,p={'Hayırsever Ad Soyad':document.getElementById('editGiftName').value,'Telefon':document.getElementById('editGiftPhone').value,'İkram Edilen Ürün':document.getElementById('editGiftProduct').value,'Adet / Paket':document.getElementById('editGiftQty').value,'İkram / Dua Notu':document.getElementById('editGiftNote').value};call('adminUpdateGift',id,p).then(()=>{msg('İkram bilgileri güncellendi. Değişiklik geçmişine kaydedildi.');closeGiftEdit();loadGifts();loadDashboard()}).catch(e=>msg(e.message,true))}
+</script>
+</body></html>

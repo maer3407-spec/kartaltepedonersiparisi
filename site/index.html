@@ -562,8 +562,41 @@
       }
     }
   </style>
-</head>
+<style>
+/* Kuruma özel, harici kütüphanesiz 3B döner yükleme ekranı */
+.loading-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(247,246,240,.96);backdrop-filter:blur(5px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
+.loading-overlay.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loading-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;text-align:center;max-width:300px}
+.doner-scene{width:150px;height:166px;display:grid;place-items:center;perspective:650px;filter:drop-shadow(0 12px 12px rgba(57,43,25,.13))}
+.doner-spin{position:relative;width:112px;height:142px;transform-style:preserve-3d;animation:donerYSpin 1.55s linear infinite}
+.doner-spit{position:absolute;z-index:0;left:50%;top:4px;bottom:3px;width:7px;transform:translateX(-50%);border-radius:8px;background:linear-gradient(90deg,#75502e,#e0b56d 45%,#714627);box-shadow:0 0 0 1px rgba(91,57,28,.12)}
+.doner-layer{position:absolute;z-index:1;left:50%;height:20px;transform:translateX(-50%);border-radius:50%;border:2px solid #7b3d20;background:linear-gradient(180deg,#e9a45b 0%,#b95e2e 42%,#7e351f 75%,#d58a45 100%);box-shadow:inset 0 3px 3px rgba(255,221,160,.65),inset 0 -3px 4px rgba(75,28,12,.35),0 2px 2px rgba(68,39,20,.17);backface-visibility:visible}
+.doner-layer:after{content:"";position:absolute;left:12%;right:12%;top:3px;height:4px;border-radius:50%;background:rgba(255,218,153,.5);filter:blur(1px)}
+.doner-layer:nth-child(2){top:9px;width:94px;height:19px}
+.doner-layer:nth-child(3){top:25px;width:87px;height:19px}
+.doner-layer:nth-child(4){top:41px;width:79px;height:19px}
+.doner-layer:nth-child(5){top:57px;width:71px;height:19px}
+.doner-layer:nth-child(6){top:73px;width:62px;height:18px}
+.doner-layer:nth-child(7){top:88px;width:53px;height:17px}
+.doner-layer:nth-child(8){top:102px;width:43px;height:16px}
+.doner-layer:nth-child(9){top:115px;width:32px;height:15px}
+.doner-layer:nth-child(10){top:127px;width:20px;height:13px}
+.loading-title{font:700 16px/1.35 Inter,Arial,sans-serif;color:#3d4e34;letter-spacing:.01em}
+.loading-subtitle{font:400 12px/1.5 Inter,Arial,sans-serif;color:#7a806f;margin-top:-10px}
+.loading-dots:after{content:"";display:inline-block;width:1.5em;text-align:left;animation:loadingDots 1.25s steps(4,end) infinite}
+@keyframes donerYSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+@keyframes loadingDots{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}
+@media(prefers-reduced-motion:reduce){.doner-spin{animation-duration:5s}.loading-overlay{transition:none}.loading-dots:after{animation:none;content:"..."}}
+@media print{.loading-overlay{display:none!important}}
+</style></head>
 <body>
+<div id="loadingOverlay" class="loading-overlay" role="status" aria-live="polite" aria-label="Sayfa yükleniyor">
+  <div class="loading-content">
+    <div class="doner-scene" aria-hidden="true"><div class="doner-spin"><i class="doner-spit"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i><i class="doner-layer"></i></div></div>
+    <div class="loading-title" id="loadingTitle">Lütfen bekleyiniz<span class="loading-dots"></span></div>
+    <div class="loading-subtitle" id="loadingSubtitle">Organizasyon bilgileri yükleniyor</div>
+  </div>
+</div>
 
   <div class="container">
 
@@ -849,10 +882,15 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdm48QZ6Zljaup3v32I1oQH9V4yDCdkbMjIqy3SgIUB1dvtOzf-12xMxBFdbf5E1zo/exec";
     let publicConfig = { pricePerKg: 0, orderOpen: true, cashEnabled: true, bankEnabled: true };
+    let publicConfigFinished = false, publicLoadingTimer = null;
+    function publicLoadingHide(){ if(publicConfigFinished)return; publicConfigFinished=true; if(publicLoadingTimer)clearTimeout(publicLoadingTimer); document.getElementById('loadingOverlay')?.classList.add('is-hidden'); }
+    function publicLoadingShow(message){ const o=document.getElementById('loadingOverlay'); if(o){o.classList.remove('is-hidden'); const sub=document.getElementById('loadingSubtitle'); if(sub&&message)sub.textContent=message;} }
 
     function publicConfigYukle() {
+      publicLoadingShow('Organizasyon fiyatı, kapasitesi ve seçenekleri alınıyor');
+      publicLoadingTimer = setTimeout(publicLoadingHide, 15000);
       window.v21PublicConfig = function(cfg) {
-        if (!cfg) return; publicConfig = cfg;
+        if (!cfg) { publicLoadingHide(); return; } publicConfig = cfg;
         const info = document.getElementById('dynamicPublicInfo');
         info.style.display = 'block';
         info.innerHTML = '<b>Kg fiyatı:</b> ' + Number(cfg.pricePerKg || 0).toLocaleString('tr-TR') + ' TL &nbsp; · &nbsp; <b>Kalan kapasite:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' + (cfg.publicNotice ? '<br>' + String(cfg.publicNotice).replace(/[<>]/g,'') : '');
@@ -869,8 +907,9 @@
         if (!cfg.orderOpen) { document.querySelectorAll('.product-btn.btn-olive').forEach(b=>{b.disabled=true;b.style.opacity='.45';}); }
         sepetArayuzunuGuncelle();
         if (document.getElementById('ikramFormu').style.display === 'block') ikramTutarGuncelle();
+        publicLoadingHide();
       };
-      const sc = document.createElement('script'); sc.src = SCRIPT_URL + '?action=publicConfig&callback=v21PublicConfig&_=' + Date.now(); sc.onerror = () => console.warn('Dinamik ayarlar yüklenemedi; statik form kullanılmaya devam ediyor.'); document.head.appendChild(sc);
+      const sc = document.createElement('script'); sc.src = SCRIPT_URL + '?action=publicConfig&callback=v21PublicConfig&_=' + Date.now(); sc.onerror = () => { console.warn('Dinamik ayarlar yüklenemedi; statik form kullanılmaya devam ediyor.'); publicLoadingHide(); }; sc.onload = () => { if (!publicConfigFinished) publicLoadingHide(); }; document.head.appendChild(sc);
     }
 
     let sepet = {
@@ -1082,8 +1121,10 @@
         payload.not = document.getElementById('ikram_not').value;
       }
       const eskiYazi = aktifButon.innerText;
+      publicLoadingShow(kategori === 'satis' ? 'Siparişiniz kaydediliyor' : 'İkram kaydınız oluşturuluyor');
       aktifButon.innerText = 'Kaydediliyor...'; aktifButon.disabled = true;
       const tamamla = (result) => {
+        document.getElementById('loadingOverlay')?.classList.add('is-hidden');
         aktifButon.innerText = eskiYazi; aktifButon.disabled = false;
         if (!result || result.status !== 'success' || !result.id) { alert((result && result.message) || 'Kayıt tamamlanamadı. Lütfen tekrar deneyin.'); return; }
         formuKapat(); e.target.reset();
@@ -1093,7 +1134,7 @@
         document.getElementById('trackCreatedRecord').href = './siparis-takip.html?id=' + encodeURIComponent(result.id);
         document.getElementById('successModal').classList.add('active');
       };
-      const hata = (err) => { aktifButon.innerText = eskiYazi; aktifButon.disabled = false; alert('Kayıt hatası: ' + (err.message || err)); };
+      const hata = (err) => { document.getElementById('loadingOverlay')?.classList.add('is-hidden'); aktifButon.innerText = eskiYazi; aktifButon.disabled = false; alert('Kayıt hatası: ' + (err.message || err)); };
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(tamamla).withFailureHandler(hata).kaydiTabloyaYaz(payload);
       } else {

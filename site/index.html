@@ -947,7 +947,7 @@
         const info = document.getElementById('dynamicPublicInfo');
         if (info) {
           info.style.display = 'block';
-          info.innerHTML = '<b>Kalan kapasite:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' +
+          info.innerHTML = '<b>Kalan Döner Miktarı:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' +
             (cfg.publicNotice ? '<br>' + String(cfg.publicNotice).replace(/[<>]/g,'') : '');
         }
         document.getElementById('hesapAdiMetni').innerText = cfg.accountName || '';

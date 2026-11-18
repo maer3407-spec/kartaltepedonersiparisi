@@ -546,6 +546,32 @@
   object-fit: contain;
   border-radius: inherit;
 }
+/* Sipariş görsellerinde nazik, ritmik nabız animasyonu */
+.product-image-card .product-card-image {
+  transform-origin: center;
+  animation: donerPulse 1.8s ease-in-out infinite;
+}
+@keyframes donerPulse {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.025); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.018); }
+  58% { transform: scale(1); }
+}
+.gift-section-heading {
+  grid-column: 1 / -1;
+  padding: 13px 15px;
+  margin-top: 8px;
+  border-radius: 12px;
+  background: #eef2ec;
+  color: var(--olive-primary);
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-image-card .product-card-image { animation: none !important; }
+}
 
 .product-image-card .cart-pill {
   position: absolute;
@@ -657,6 +683,8 @@
     >
     <span class="cart-pill" id="pill_kg05">0 paket</span>
   </button>
+        <div class="gift-section-heading">Talebelere İkram Edin</div>
+
         <!-- 3. Ürün -->
         <button type="button" class="product-btn btn-blue" onclick="ikramFormuAc('Talebeye 1 Kg İkram')">
           <div class="card-top-row">
@@ -905,7 +933,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdm48QZ6Zljaup3v32I1oQH9V4yDCdkbMjIqy3SgIUB1dvtOzf-12xMxBFdbf5E1zo/exec";
-    let publicConfig = { pricePerKg: 0, orderOpen: true, cashEnabled: true, bankEnabled: true };
+    let publicConfig = { pricePerKg: 0, pricePerHalfKg: 0, orderOpen: true, cashEnabled: true, bankEnabled: true };
     let publicConfigFinished = false, publicLoadingTimer = null;
     function publicLoadingHide(){ if(publicConfigFinished)return; publicConfigFinished=true; if(publicLoadingTimer)clearTimeout(publicLoadingTimer); document.getElementById('loadingOverlay')?.classList.add('is-hidden'); }
     function publicLoadingShow(message){ const o=document.getElementById('loadingOverlay'); if(o){o.classList.remove('is-hidden'); const sub=document.getElementById('loadingSubtitle'); if(sub&&message)sub.textContent=message;} }
@@ -916,8 +944,11 @@
       window.v21PublicConfig = function(cfg) {
         if (!cfg) { publicLoadingHide(); return; } publicConfig = cfg;
         const info = document.getElementById('dynamicPublicInfo');
-        info.style.display = 'block';
-        info.innerHTML = '<b>Kg fiyatı:</b> ' + Number(cfg.pricePerKg || 0).toLocaleString('tr-TR') + ' TL &nbsp; · &nbsp; <b>Kalan kapasite:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' + (cfg.publicNotice ? '<br>' + String(cfg.publicNotice).replace(/[<>]/g,'') : '');
+        if (info) {
+          info.style.display = 'block';
+          info.innerHTML = '<b>Kalan kapasite:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' +
+            (cfg.publicNotice ? '<br>' + String(cfg.publicNotice).replace(/[<>]/g,'') : '');
+        }
         document.getElementById('hesapAdiMetni').innerText = cfg.accountName || '';
         document.getElementById('ibanMetni').innerText = cfg.iban || '';
         const address = document.querySelector('.address-box');
@@ -944,6 +975,10 @@
     const pendingRequestKeys = { satis: null, ikram: null };
     function yeniIstekAnahtari(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
     document.addEventListener("DOMContentLoaded", () => { document.getElementById("satisFormu")?.addEventListener("input", () => pendingRequestKeys.satis = null); document.getElementById("ikramFormu")?.addEventListener("input", () => pendingRequestKeys.ikram = null); });
+
+    function yarimKgPaketFiyati() {
+      return Number(publicConfig.pricePerHalfKg) || 0;
+    }
 
     function kgFormatla(sayi) {
       return Number.isInteger(sayi) ? sayi + " kg" : sayi.toFixed(1).replace('.', ',') + " kg";
@@ -1005,7 +1040,7 @@
         html += `
           <div class="cart-item-row">
             <div class="cart-item-info">
-              1 Kg'lık Paket: <strong>${sepet.kg1} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg1 * 1)})</span>
+              1 Kg'lık Paket: <strong>${sepet.kg1} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg1 * 1)}) · ${(sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)).toLocaleString('tr-TR')} TL</span>
             </div>
             <div class="qty-controls">
               <button type="button" class="qty-btn" aria-label="Azalt" onclick="sepetAdetDegistir('kg1', -1)">-</button>
@@ -1018,7 +1053,7 @@
         html += `
           <div class="cart-item-row">
             <div class="cart-item-info">
-              Yarım Kg'lık Paket: <strong>${sepet.kg05} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg05 * 0.5)})</span>
+              Yarım Kg'lık Paket: <strong>${sepet.kg05} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg05 * 0.5)}) · ${(sepet.kg05 * yarimKgPaketFiyati()).toLocaleString('tr-TR')} TL</span>
             </div>
             <div class="qty-controls">
               <button type="button" class="qty-btn" aria-label="Azalt" onclick="sepetAdetDegistir('kg05', -1)">-</button>
@@ -1029,7 +1064,7 @@
 
       sepetSatirlari.innerHTML = html;
       document.getElementById('sepetToplamKg').innerText = kgFormatla(toplamKgSayi);
-      const tutar = toplamKgSayi * (Number(publicConfig.pricePerKg) || 0);
+      const tutar = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) + (sepet.kg05 * yarimKgPaketFiyati());
       document.getElementById('sepetTahminiTutar').innerText = publicConfig.pricePerKg ? 'Tahmini toplam: ' + tutar.toLocaleString('tr-TR') + ' TL' : '';
     }
 
@@ -1078,8 +1113,9 @@
     function ikramTutarGuncelle() {
       const adet = Math.max(1, Number(document.getElementById('ikram_adet')?.value) || 1);
       const kg = adet * (String(aktifIkramUrunu).indexOf('Yarım') !== -1 ? 0.5 : 1);
-      const price = Number(publicConfig.pricePerKg) || 0;
-      const total = kg * price;
+      const yarimMi = String(aktifIkramUrunu).indexOf('Yarım') !== -1;
+      const price = yarimMi ? yarimKgPaketFiyati() : (Number(publicConfig.pricePerKg) || 0);
+      const total = adet * price;
       const el = document.getElementById('ikramFiyatBilgi');
       if (el) el.textContent = price ? 'Toplam: ' + kgFormatla(kg) + ' · ' + total.toLocaleString('tr-TR') + ' TL' : 'Toplam miktar: ' + kgFormatla(kg);
     }

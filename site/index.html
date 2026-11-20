@@ -608,6 +608,44 @@
         min-height: auto;
       }
     }
+    /* Kayan başlık animasyonu */
+.marquee-heading {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  padding: 12px 0;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  flex-shrink: 0;
+  animation: marqueeSlide 18s linear infinite;
+}
+
+.marquee-track span {
+  display: block;
+  flex-shrink: 0;
+  padding-right: 35px;
+}
+
+@keyframes marqueeSlide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Hareket hassasiyeti */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
   </style>
 <style>
 /* Kuruma özel, harici kütüphanesiz 3B döner yükleme ekranı */
@@ -656,7 +694,12 @@
       </div>
       
       <div class="quick-grid">
-        <div class="gift-section-heading">Döner Sipariş Verin</div>
+        <div class="gift-section-heading marquee-heading">
+    <div class="marquee-track">
+      <span>Döner Sipariş Verin • Döner Sipariş Verin • Döner Sipariş Verin •</span>
+      <span aria-hidden="true">Döner Sipariş Verin • Döner Sipariş Verin • Döner Sipariş Verin •</span>
+    </div>
+  </div>
        <!-- 1. ÜRÜN: 1000 GRAM -->
   <button
     type="button"
@@ -684,7 +727,12 @@
     >
     <span class="cart-pill" id="pill_kg05">0 paket</span>
   </button>
-        <div class="gift-section-heading">Talebelere İkram Edin</div>
+       <div class="gift-section-heading marquee-heading">
+  <div class="marquee-track">
+    <span>Talebelere İkram Edin • Talebelere İkram Edin • Talebelere İkram Edin •</span>
+    <span aria-hidden="true">Talebelere İkram Edin • Talebelere İkram Edin • Talebelere İkram Edin •</span>
+  </div>
+</div>
 
         <!-- 3. Ürün -->
         <button type="button" class="product-btn btn-blue" onclick="ikramFormuAc('Talebeye 1 Kg İkram')">

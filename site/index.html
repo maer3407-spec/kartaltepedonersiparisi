@@ -694,7 +694,7 @@
       </div>
       
       <div class="quick-grid">
-  <div class="gift-section-heading marquee-heading">
+        <div class="gift-section-heading marquee-heading">
     <div class="marquee-track">
       <span>Döner Sipariş Verin • Döner Sipariş Verin • Döner Sipariş Verin •</span>
       <span aria-hidden="true">Döner Sipariş Verin • Döner Sipariş Verin • Döner Sipariş Verin •</span>
@@ -727,7 +727,7 @@
     >
     <span class="cart-pill" id="pill_kg05">0 paket</span>
   </button>
-        <div class="gift-section-heading marquee-heading">
+       <div class="gift-section-heading marquee-heading">
   <div class="marquee-track">
     <span>Talebelere İkram Edin • Talebelere İkram Edin • Talebelere İkram Edin •</span>
     <span aria-hidden="true">Talebelere İkram Edin • Talebelere İkram Edin • Talebelere İkram Edin •</span>
@@ -770,6 +770,7 @@
           <span>Toplam Miktar</span>
           <span class="cart-total-kg" id="sepetToplamKg">0 kg</span>
         </div>
+        <div id="sepetIndirimBilgi" style="display:none;padding:10px 12px;margin:0 0 12px;border:1px solid #cbd8c3;border-radius:8px;background:#EFF3EC;color:#3B4B32;font-size:.86rem;font-weight:700;text-align:center;" aria-live="polite"></div>
         <div id="sepetTahminiTutar" style="font-size:.9rem;font-weight:700;color:#4A5D3F;margin:0 0 12px;"></div>
 
         <button type="button" class="action-btn btn-primary-olive" style="width:100%;" onclick="satisFormuAc()">
@@ -852,7 +853,7 @@
           <input type="tel" id="satis_tel" class="form-control" required placeholder="05XX XXX XX XX">
         </div>
 
-        <div class="form-row-2">
+       <div class="form-row-2">
   <div class="form-group">
     <label for="satis_sekil">Teslimat Şekli *</label>
     <select id="satis_sekil" class="form-control" onchange="adresAlaniGuncelle()">
@@ -1000,7 +1001,7 @@
         const info = document.getElementById('dynamicPublicInfo');
         if (info) {
           info.style.display = 'block';
-          info.innerHTML = '<b>Kalan kapasite:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' +
+          info.innerHTML = '<b>Kalan Döner Miktarı:</b> ' + Number(cfg.remainingKg || 0).toLocaleString('tr-TR') + ' kg' +
             (cfg.publicNotice ? '<br>' + String(cfg.publicNotice).replace(/[<>]/g,'') : '');
         }
         document.getElementById('hesapAdiMetni').innerText = cfg.accountName || '';
@@ -1068,22 +1069,6 @@
       sepetArayuzunuGuncelle();
     }
 
-    // Sepet tutarını hesaplar; toplam 2 kg ve üzerindeyse %10 indirim uygular.
-    function sepetTutarHesapla() {
-      const toplamKg = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
-      const araToplam = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) +
-                        (sepet.kg05 * yarimKgPaketFiyati());
-      const indirimOrani = toplamKg >= 2 ? 0.10 : 0;
-      const indirimTutari = araToplam * indirimOrani;
-      return {
-        toplamKg,
-        araToplam,
-        indirimOrani,
-        indirimTutari,
-        genelToplam: araToplam - indirimTutari
-      };
-    }
-
     function sepetArayuzunuGuncelle() {
       const pill1 = document.getElementById('pill_kg1');
       const pill05 = document.getElementById('pill_kg05');
@@ -1096,11 +1081,12 @@
 
       const sepetKutusu = document.getElementById('sepetKutusu');
       const sepetSatirlari = document.getElementById('sepetSatirlari');
-      const hesap = sepetTutarHesapla();
-      const toplamKgSayi = hesap.toplamKg;
+      const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
 
       if (toplamKgSayi === 0) {
         sepetKutusu.classList.remove('active');
+        document.getElementById('sepetIndirimBilgi').style.display = 'none';
+        document.getElementById('sepetTahminiTutar').innerText = '';
         return;
       }
 
@@ -1135,18 +1121,32 @@
 
       sepetSatirlari.innerHTML = html;
       document.getElementById('sepetToplamKg').innerText = kgFormatla(toplamKgSayi);
-      const tutarEl = document.getElementById('sepetTahminiTutar');
-      if (publicConfig.pricePerKg || publicConfig.pricePerHalfKg) {
-        if (hesap.indirimOrani > 0) {
-          tutarEl.innerHTML = 'Ara toplam: <s>' + hesap.araToplam.toLocaleString('tr-TR') + ' TL</s>' +
-            '<br><span style="color:#2B4C65;">2 kg ve üzeri %10 indirim: -' + hesap.indirimTutari.toLocaleString('tr-TR') + ' TL</span>' +
-            '<br><strong>İndirimli toplam: ' + hesap.genelToplam.toLocaleString('tr-TR') + ' TL</strong>';
-        } else {
-          tutarEl.textContent = 'Tahmini toplam: ' + hesap.araToplam.toLocaleString('tr-TR') + ' TL' +
-            (toplamKgSayi < 2 ? ' · 2 kg ve üzeri %10 indirim' : '');
-        }
+      const araToplam = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) + (sepet.kg05 * yarimKgPaketFiyati());
+      const indirimKazandi = toplamKgSayi >= 2;
+      const indirimTutari = indirimKazandi ? araToplam * 0.10 : 0;
+      const indirimliToplam = araToplam - indirimTutari;
+
+      const indirimBilgi = document.getElementById('sepetIndirimBilgi');
+      if (indirimKazandi) {
+        indirimBilgi.style.display = 'block';
+        indirimBilgi.textContent = 'Tebrikler %10 indirim kazandınız.';
+      } else if (toplamKgSayi >= 1.5) {
+        indirimBilgi.style.display = 'block';
+        indirimBilgi.textContent = 'Yarım kg daha ekleyin %10 indirim kazanın.';
       } else {
-        tutarEl.textContent = '';
+        indirimBilgi.style.display = 'none';
+        indirimBilgi.textContent = '';
+      }
+
+      const tutarAlani = document.getElementById('sepetTahminiTutar');
+      if (publicConfig.pricePerKg) {
+        tutarAlani.innerHTML = indirimKazandi
+          ? 'Ara toplam: <s>' + araToplam.toLocaleString('tr-TR') + ' TL</s><br>' +
+            ' %10 indirim: -' + indirimTutari.toLocaleString('tr-TR') + ' TL<br>' +
+            '<strong>İndirimli toplam: ' + indirimliToplam.toLocaleString('tr-TR') + ' TL</strong>'
+          : 'Tahmini toplam: ' + araToplam.toLocaleString('tr-TR') + ' TL';
+      } else {
+        tutarAlani.innerText = '';
       }
     }
 
@@ -1170,12 +1170,7 @@
 
       const etiket = document.getElementById('secilenUrunEtiketi');
       etiket.classList.remove('blue-badge');
-      const hesap = sepetTutarHesapla();
-      etiket.innerHTML = `<strong>Paket Dağılımı:</strong> ${sepetMetniOlustur()}<br><strong>Toplam Ağırlık:</strong> ${kgFormatla(toplamKgSayi)}` +
-        (publicConfig.pricePerKg || publicConfig.pricePerHalfKg ?
-          `<br><strong>Ara Toplam:</strong> ${hesap.araToplam.toLocaleString('tr-TR')} TL` +
-          (hesap.indirimOrani ? `<br><strong>%10 İndirim:</strong> -${hesap.indirimTutari.toLocaleString('tr-TR')} TL<br><strong>Ödenecek Tutar:</strong> ${hesap.genelToplam.toLocaleString('tr-TR')} TL` :
-            `<br><strong>Ödenecek Tutar:</strong> ${hesap.genelToplam.toLocaleString('tr-TR')} TL`) : '');
+      etiket.innerHTML = `<strong>Paket Dağılımı:</strong> ${sepetMetniOlustur()}<br><strong>Toplam Ağırlık:</strong> ${kgFormatla(toplamKgSayi)}`;
 
       document.getElementById('modalBaslik').innerText = "Teslimat ve Sipariş Formu";
       document.getElementById('satisFormu').style.display = "block";
@@ -1245,12 +1240,14 @@
       if (kategori === 'satis') {
         const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
         const adreseTeslimMi = document.getElementById('satis_sekil').value === 'Adrese Teslim';
-        const hesap = sepetTutarHesapla();
+        const araToplam = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) + (sepet.kg05 * yarimKgPaketFiyati());
+        const indirimOrani = toplamKgSayi >= 2 ? 10 : 0;
+        const indirimTutari = araToplam * indirimOrani / 100;
         payload.adet1Kg = sepet.kg1; payload.adetYarimKg = sepet.kg05; payload.toplamKgSayi = toplamKgSayi;
-        payload.araToplam = hesap.araToplam;
-        payload.indirimOrani = hesap.indirimOrani;
-        payload.indirimTutari = hesap.indirimTutari;
-        payload.genelToplam = hesap.genelToplam;
+        payload.araToplam = araToplam;
+        payload.indirimOrani = indirimOrani;
+        payload.indirimTutari = indirimTutari;
+        payload.indirimliToplam = araToplam - indirimTutari;
         payload.adSoyad = document.getElementById('satis_ad').value;
         payload.telefon = document.getElementById('satis_tel').value;
         payload.teslimatSekli = document.getElementById('satis_sekil').value;

@@ -988,7 +988,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdm48QZ6Zljaup3v32I1oQH9V4yDCdkbMjIqy3SgIUB1dvtOzf-12xMxBFdbf5E1zo/exec";
-    let publicConfig = { pricePerKg: 0, pricePerHalfKg: 0, orderOpen: true, cashEnabled: true, bankEnabled: true };
+    let publicConfig = { pricePerKg: 4500, pricePerHalfKg: 2500, orderOpen: true, cashEnabled: true, bankEnabled: true };
     let publicConfigFinished = false, publicLoadingTimer = null;
     function publicLoadingHide(){ if(publicConfigFinished)return; publicConfigFinished=true; if(publicLoadingTimer)clearTimeout(publicLoadingTimer); document.getElementById('loadingOverlay')?.classList.add('is-hidden'); }
     function publicLoadingShow(message){ const o=document.getElementById('loadingOverlay'); if(o){o.classList.remove('is-hidden'); const sub=document.getElementById('loadingSubtitle'); if(sub&&message)sub.textContent=message;} }
@@ -997,7 +997,10 @@
       publicLoadingShow('Gerekli Bilgiler Tazeleniyor.');
       publicLoadingTimer = setTimeout(publicLoadingHide, 15000);
       window.v21PublicConfig = function(cfg) {
-        if (!cfg) { publicLoadingHide(); return; } publicConfig = cfg;
+        if (!cfg) { publicLoadingHide(); return; }
+        publicConfig = Object.assign({ pricePerKg: 4500, pricePerHalfKg: 2500 }, cfg);
+        if (!(Number(publicConfig.pricePerKg) > 0)) publicConfig.pricePerKg = 4500;
+        if (!(Number(publicConfig.pricePerHalfKg) > 0)) publicConfig.pricePerHalfKg = 2500;
         const info = document.getElementById('dynamicPublicInfo');
         if (info) {
           info.style.display = 'block';
@@ -1028,11 +1031,32 @@
     };
     let aktifIkramUrunu = "";
     const pendingRequestKeys = { satis: null, ikram: null };
-    function yeniIstekAnahtari(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+    function yeniIstekAnahtari(){ return (window.crypto && window.randomUUID) ? window.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
     document.addEventListener("DOMContentLoaded", () => { document.getElementById("satisFormu")?.addEventListener("input", () => pendingRequestKeys.satis = null); document.getElementById("ikramFormu")?.addEventListener("input", () => pendingRequestKeys.ikram = null); });
 
+    function birimKgFiyati() {
+      return Number(publicConfig.pricePerKg) || 4500;
+    }
+
     function yarimKgPaketFiyati() {
-      return Number(publicConfig.pricePerHalfKg) || 0;
+      return Number(publicConfig.pricePerHalfKg) || 2500;
+    }
+
+    // Yalnız 0,5 kg siparişte 2.500 TL sabit fiyat, 0,5 kg üzeri siparişlerde 4.500 TL/kg orantılı fiyat hesaplar
+    function satisFiyatHesapla(adet1Kg, adetYarimKg) {
+      const n1 = Number(adet1Kg) || 0;
+      const n05 = Number(adetYarimKg) || 0;
+      const toplamKg = (n1 * 1) + (n05 * 0.5);
+      if (toplamKg <= 0) {
+        return { toplamKg: 0, araToplam: 0, indirimOrani: 0, indirimTutari: 0, indirimliToplam: 0 };
+      }
+      const araToplam = toplamKg === 0.5
+        ? Math.round(yarimKgPaketFiyati() * 100) / 100
+        : Math.round((toplamKg * birimKgFiyati()) * 100) / 100;
+      const indirimOrani = toplamKg >= 2 ? 10 : 0;
+      const indirimTutari = Math.round((araToplam * indirimOrani / 100) * 100) / 100;
+      const indirimliToplam = Math.round((araToplam - indirimTutari) * 100) / 100;
+      return { toplamKg, araToplam, indirimOrani, indirimTutari, indirimliToplam };
     }
 
     function kgFormatla(sayi) {
@@ -1081,7 +1105,8 @@
 
       const sepetKutusu = document.getElementById('sepetKutusu');
       const sepetSatirlari = document.getElementById('sepetSatirlari');
-      const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
+      const hesap = satisFiyatHesapla(sepet.kg1, sepet.kg05);
+      const toplamKgSayi = hesap.toplamKg;
 
       if (toplamKgSayi === 0) {
         sepetKutusu.classList.remove('active');
@@ -1092,12 +1117,15 @@
 
       sepetKutusu.classList.add('active');
       let html = "";
+      const kg1SatirTutar = sepet.kg1 * birimKgFiyati();
+      const yarimKgSatirBirim = toplamKgSayi === 0.5 ? yarimKgPaketFiyati() : (birimKgFiyati() * 0.5);
+      const kg05SatirTutar = sepet.kg05 * yarimKgSatirBirim;
 
       if (sepet.kg1 > 0) {
         html += `
           <div class="cart-item-row">
             <div class="cart-item-info">
-              1 Kg'lık Paket: <strong>${sepet.kg1} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg1 * 1)}) · ${(sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)).toLocaleString('tr-TR')} TL</span>
+              1 Kg'lık Paket: <strong>${sepet.kg1} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg1 * 1)}) · ${kg1SatirTutar.toLocaleString('tr-TR')} TL</span>
             </div>
             <div class="qty-controls">
               <button type="button" class="qty-btn" aria-label="Azalt" onclick="sepetAdetDegistir('kg1', -1)">-</button>
@@ -1110,7 +1138,7 @@
         html += `
           <div class="cart-item-row">
             <div class="cart-item-info">
-              Yarım Kg'lık Paket: <strong>${sepet.kg05} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg05 * 0.5)}) · ${(sepet.kg05 * yarimKgPaketFiyati()).toLocaleString('tr-TR')} TL</span>
+              Yarım Kg'lık Paket: <strong>${sepet.kg05} Adet</strong> <span class="cart-item-kg">(${kgFormatla(sepet.kg05 * 0.5)}) · ${kg05SatirTutar.toLocaleString('tr-TR')} TL</span>
             </div>
             <div class="qty-controls">
               <button type="button" class="qty-btn" aria-label="Azalt" onclick="sepetAdetDegistir('kg05', -1)">-</button>
@@ -1121,33 +1149,32 @@
 
       sepetSatirlari.innerHTML = html;
       document.getElementById('sepetToplamKg').innerText = kgFormatla(toplamKgSayi);
-      const araToplam = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) + (sepet.kg05 * yarimKgPaketFiyati());
-      const indirimKazandi = toplamKgSayi >= 2;
-      const indirimTutari = indirimKazandi ? araToplam * 0.10 : 0;
-      const indirimliToplam = araToplam - indirimTutari;
+      const araToplam = hesap.araToplam;
+      const indirimKazandi = hesap.indirimOrani > 0;
+      const indirimTutari = hesap.indirimTutari;
+      const indirimliToplam = hesap.indirimliToplam;
 
       const indirimBilgi = document.getElementById('sepetIndirimBilgi');
       if (indirimKazandi) {
         indirimBilgi.style.display = 'block';
         indirimBilgi.textContent = 'Tebrikler %10 indirim kazandınız.';
-      } else if (toplamKgSayi >= 1.5) {
+      } else if (toplamKgSayi === 1.5) {
         indirimBilgi.style.display = 'block';
-        indirimBilgi.textContent = 'Yarım kg daha ekleyin %10 indirim kazanın.';
+        indirimBilgi.textContent = '0,5 kg üzeri orantılı tarife (4.500 TL/kg) uygulandı. Yarım kg daha ekleyin %10 indirim kazanın.';
+      } else if (toplamKgSayi === 0.5) {
+        indirimBilgi.style.display = 'block';
+        indirimBilgi.textContent = 'Yalnız 0,5 kg siparişte 2.500 TL sabit tarife uygulanır (0,5 kg üzeri siparişlerde 4.500 TL/kg).';
       } else {
-        indirimBilgi.style.display = 'none';
-        indirimBilgi.textContent = '';
+        indirimBilgi.style.display = 'block';
+        indirimBilgi.textContent = '0,5 kg üzeri siparişlerde 4.500 TL/kg orantılı fiyat uygulanmaktadır.';
       }
 
       const tutarAlani = document.getElementById('sepetTahminiTutar');
-      if (publicConfig.pricePerKg) {
-        tutarAlani.innerHTML = indirimKazandi
-          ? 'Ara toplam: <s>' + araToplam.toLocaleString('tr-TR') + ' TL</s><br>' +
-            ' %10 indirim: -' + indirimTutari.toLocaleString('tr-TR') + ' TL<br>' +
-            '<strong>İndirimli toplam: ' + indirimliToplam.toLocaleString('tr-TR') + ' TL</strong>'
-          : 'Tahmini toplam: ' + araToplam.toLocaleString('tr-TR') + ' TL';
-      } else {
-        tutarAlani.innerText = '';
-      }
+      tutarAlani.innerHTML = indirimKazandi
+        ? 'Ara toplam: <s>' + araToplam.toLocaleString('tr-TR') + ' TL</s><br>' +
+          ' %10 indirim: -' + indirimTutari.toLocaleString('tr-TR') + ' TL<br>' +
+          '<strong>İndirimli toplam: ' + indirimliToplam.toLocaleString('tr-TR') + ' TL</strong>'
+        : 'Tahmini toplam: ' + araToplam.toLocaleString('tr-TR') + ' TL';
     }
 
     function sepetMetniOlustur() {
@@ -1162,7 +1189,8 @@
     }
 
     function satisFormuAc() {
-      const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
+      const hesap = satisFiyatHesapla(sepet.kg1, sepet.kg05);
+      const toplamKgSayi = hesap.toplamKg;
       if (toplamKgSayi === 0) {
         bildirimGoster("Lütfen önce sepete ürün ekleyiniz.");
         return;
@@ -1170,7 +1198,7 @@
 
       const etiket = document.getElementById('secilenUrunEtiketi');
       etiket.classList.remove('blue-badge');
-      etiket.innerHTML = `<strong>Paket Dağılımı:</strong> ${sepetMetniOlustur()}<br><strong>Toplam Ağırlık:</strong> ${kgFormatla(toplamKgSayi)}`;
+      etiket.innerHTML = `<strong>Paket Dağılımı:</strong> ${sepetMetniOlustur()}<br><strong>Toplam Ağırlık:</strong> ${kgFormatla(toplamKgSayi)}<br><strong>Toplam Tutar:</strong> ${hesap.indirimliToplam.toLocaleString('tr-TR')} TL`;
 
       document.getElementById('modalBaslik').innerText = "Teslimat ve Sipariş Formu";
       document.getElementById('satisFormu').style.display = "block";
@@ -1194,12 +1222,11 @@
 
     function ikramTutarGuncelle() {
       const adet = Math.max(1, Number(document.getElementById('ikram_adet')?.value) || 1);
-      const kg = adet * (String(aktifIkramUrunu).indexOf('Yarım') !== -1 ? 0.5 : 1);
       const yarimMi = String(aktifIkramUrunu).indexOf('Yarım') !== -1;
-      const price = yarimMi ? yarimKgPaketFiyati() : (Number(publicConfig.pricePerKg) || 0);
-      const total = adet * price;
+      const kg = adet * (yarimMi ? 0.5 : 1);
+      const total = kg === 0.5 ? yarimKgPaketFiyati() : (kg * birimKgFiyati());
       const el = document.getElementById('ikramFiyatBilgi');
-      if (el) el.textContent = price ? 'Toplam: ' + kgFormatla(kg) + ' · ' + total.toLocaleString('tr-TR') + ' TL' : 'Toplam miktar: ' + kgFormatla(kg);
+      if (el) el.textContent = total ? 'Toplam: ' + kgFormatla(kg) + ' · ' + total.toLocaleString('tr-TR') + ' TL' : 'Toplam miktar: ' + kgFormatla(kg);
     }
 
     function formuKapat() {
@@ -1238,16 +1265,15 @@
       payload.requestKey = pendingRequestKeys[kategori];
       const aktifButon = document.getElementById(kategori === 'satis' ? 'satisGonderBtn' : 'ikramGonderBtn');
       if (kategori === 'satis') {
-        const toplamKgSayi = (sepet.kg1 * 1) + (sepet.kg05 * 0.5);
+        const hesap = satisFiyatHesapla(sepet.kg1, sepet.kg05);
         const adreseTeslimMi = document.getElementById('satis_sekil').value === 'Adrese Teslim';
-        const araToplam = (sepet.kg1 * (Number(publicConfig.pricePerKg) || 0)) + (sepet.kg05 * yarimKgPaketFiyati());
-        const indirimOrani = toplamKgSayi >= 2 ? 10 : 0;
-        const indirimTutari = araToplam * indirimOrani / 100;
-        payload.adet1Kg = sepet.kg1; payload.adetYarimKg = sepet.kg05; payload.toplamKgSayi = toplamKgSayi;
-        payload.araToplam = araToplam;
-        payload.indirimOrani = indirimOrani;
-        payload.indirimTutari = indirimTutari;
-        payload.indirimliToplam = araToplam - indirimTutari;
+        payload.adet1Kg = sepet.kg1;
+        payload.adetYarimKg = sepet.kg05;
+        payload.toplamKgSayi = hesap.toplamKg;
+        payload.araToplam = hesap.araToplam;
+        payload.indirimOrani = hesap.indirimOrani;
+        payload.indirimTutari = hesap.indirimTutari;
+        payload.indirimliToplam = hesap.indirimliToplam;
         payload.adSoyad = document.getElementById('satis_ad').value;
         payload.telefon = document.getElementById('satis_tel').value;
         payload.teslimatSekli = document.getElementById('satis_sekil').value;

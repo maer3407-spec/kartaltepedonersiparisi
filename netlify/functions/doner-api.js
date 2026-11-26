@@ -1,6 +1,6 @@
 // Netlify Function proxy: public browser -> Netlify -> Google Apps Script.
 // Set APPS_SCRIPT_URL in Netlify environment variables to the deployed /exec URL.
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzdm48QZ6Zljaup3v32I1oQH9V4yDCdkbMjIqy3SgIUB1dvtOzf-12xMxBFdbf5E1zo/exec';
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbyANtkFR09RKKrzo_wogZyDC8ZmwKgJzm9HqpQldDAIPYF4_FTmTQTUdkLf5z24tP2O/exec';
 
 exports.handler = async function (event) {
   const headers = {
